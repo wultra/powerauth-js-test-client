@@ -1,0 +1,40 @@
+{
+  "name": "powerauth-js-test-client",
+  "version": "0.0.1",
+  "description": "Client library for PowerAuth Server RESTful API to support JavaScript integration tests with PowerAuth Server",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "source": "src/index",
+  "files": [
+    "README.md",
+    "dist/**/*.*",
+    "dist/*.*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wultra/powerauth-js-test-client.git"
+  },
+  "keywords": [ "powerauth", "javascript", "mobile", "typescript", "react-native", "integration-testing" ],
+  "author": {
+    "name": "Wultra s.r.o.",
+    "email": "support@wultra.com"
+  },
+  "license": "Apache 2.0",
+  "licenseFilename": "LICENSE",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/wultra/powerauth-js-test-client/issues"
+  },
+  "homepage": "https://www.wultra.com/mobile-security-suite",
+  "dependencies": {
+    "node-fetch": ">=2.6.1"
+  },
+  "peerDependencies": {
+  },
+  "devDependencies": {
+    "lodash": "^4.17.21"
+  }
+}
