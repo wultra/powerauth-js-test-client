@@ -14,18 +14,20 @@
 // limitations under the License.
 //
 
+/**
+ * The `PowerAuthServerError` is error reported from this library.
+ */
+export class PowerAuthServerError extends Error {
+    /**
+     * Construct PowerAuthServerError
+     * @param message Error message.
+     * @param httpStatusCode Optional status code from HTTP response.
+     */
+    constructor(message: string, httpStatusCode: number | undefined = undefined) {
+        super(message)
+        this.name = "PowerAuthServerError"
+        this.httpStatusCode = httpStatusCode
+    }
 
-// Main objects
-
-export * from './PowerAuthTestServer';
-export * from './PowerAuthServerError';
-export * from './Logger';
-
-// Model objects
-
-export * from './model/Activation'
-export * from './model/Application';
-export * from './model/Version';
-export * from './model/Config';
-export * from './model/ObjectId';
-export * from './model/SystemStatus';
+    httpStatusCode: number | undefined
+}

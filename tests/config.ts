@@ -14,18 +14,19 @@
 // limitations under the License.
 //
 
+import { Config, DEFAULT_APPLICATION_NAME, DEFAULT_APPLICATION_VERSION_NAME, DEFAULT_REQUEST_TIMEOUT } from "../src/model/Config";
 
-// Main objects
+const defaultLocalConfig: Config ={
+    connection: {
+        baseUrl: "http://localhost:8080/powerauth-java-server",
+        requestTimeout: DEFAULT_REQUEST_TIMEOUT
+    },
+    application: {
+        applicationName: DEFAULT_APPLICATION_NAME,
+        applicationVersion: DEFAULT_APPLICATION_VERSION_NAME
+    }
+}
 
-export * from './PowerAuthTestServer';
-export * from './PowerAuthServerError';
-export * from './Logger';
-
-// Model objects
-
-export * from './model/Activation'
-export * from './model/Application';
-export * from './model/Version';
-export * from './model/Config';
-export * from './model/ObjectId';
-export * from './model/SystemStatus';
+export function testServerConfiguration(): Config {
+    return defaultLocalConfig
+}

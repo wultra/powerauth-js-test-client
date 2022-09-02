@@ -14,18 +14,22 @@
 // limitations under the License.
 //
 
+export class TimeoutHandler {
+    private controller: AbortController
+    private handler: any
 
-// Main objects
+    constructor(timeout: number) {
+        this.controller = new AbortController()
+        new Promise(resolve => {
+            this.handler = setTimeout(() => { this.controller.abort() }, timeout)
+        })
+    }
 
-export * from './PowerAuthTestServer';
-export * from './PowerAuthServerError';
-export * from './Logger';
+    get signal(): any {
+        return this.controller.signal
+    }
 
-// Model objects
-
-export * from './model/Activation'
-export * from './model/Application';
-export * from './model/Version';
-export * from './model/Config';
-export * from './model/ObjectId';
-export * from './model/SystemStatus';
+    clear() {
+        clearTimeout(this.handler)
+    }
+}

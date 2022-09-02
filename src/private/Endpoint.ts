@@ -14,18 +14,6 @@
 // limitations under the License.
 //
 
-
-// Main objects
-
-export * from './PowerAuthTestServer';
-export * from './PowerAuthServerError';
-export * from './Logger';
-
-// Model objects
-
-export * from './model/Activation'
-export * from './model/Application';
-export * from './model/Version';
-export * from './model/Config';
-export * from './model/ObjectId';
-export * from './model/SystemStatus';
+export interface Endpoint {
+    path: string
+}
