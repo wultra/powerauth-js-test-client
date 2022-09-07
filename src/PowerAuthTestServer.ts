@@ -14,19 +14,44 @@
 // limitations under the License.
 //
 
+import { Logger } from "./Logger"
 import { PowerAuthServerError } from "./PowerAuthServerError"
-import { Application, ApplicationDetail, ApplicationVersion, ApplicationWithVersion } from "./model/Application"
-import { ApplicationConfig, Config, DEFAULT_APPLICATION_NAME, DEFAULT_APPLICATION_VERSION_NAME } from "./model/Config"
 import { SystemStatus } from "./model/SystemStatus"
 import { ServerVersion } from "./model/Version"
 import { ServerAPI } from "./private/ServerAPI"
 import { ClientFactory } from "./private/ClientFactory"
-import { Logger } from "./Logger"
+import { RecoveryConfig } from "./model/Recovery"
+import {
+    Activation,
+    ActivationDetail,
+    ActivationOtpValidation,
+    ActivationPrepareData,
+    ActivationPrepareResult,
+    ActivationStatus } from "./model/Activation"
+import {
+    Application,
+    ApplicationDetail,
+    ApplicationVersion,
+    ApplicationSetup } from "./model/Application"
+import {
+    ApplicationConfig,
+    Config,
+    DEFAULT_APPLICATION_NAME,
+    DEFAULT_APPLICATION_VERSION_NAME,
+    DEFAULT_MAX_FAILED_ATTEMPTS } from "./model/Config"
 
+/**
+ * Class that implements connection to PowerAuth Server RESTful API.
+ */
 export class PowerAuthTestServer {
 
     readonly config: Config
 
+    /**
+     * Construct object with configuration.
+     * @param config Configuration used to connection.
+     * @param testPrefix If provided, then such prefix will be used for all default identifiers, such as userId or application name.
+     */
     constructor(config: Config) {
         Logger.setBaseUrlForRequests(config.connection.baseUrl)
         this.config = config
@@ -34,6 +59,9 @@ export class PowerAuthTestServer {
 
     private apiInstance: ServerAPI | undefined
 
+    /**
+     * Contains internal `ServerAPI`. If connection is not established, then throws error.
+     */
     private get api(): ServerAPI {
         if (!this.apiInstance) {
             throw new PowerAuthServerError("There's no connection to server")
@@ -78,6 +106,7 @@ export class PowerAuthTestServer {
     async getServerVersion(): Promise<ServerVersion> {
         return await this.api.getServerVersion()
     }
+
 
     // Application management
 
@@ -157,18 +186,14 @@ export class PowerAuthTestServer {
 
     /**
      * Prepare pair of application and its version from configuration. If no configuration object is provided, then
-     * the configuration provided in this object's constructor is used. If such configuration has no 'application' section
+     * the configuration provided in this object's constructor is used.
      * @param applicationConfig Configuration for application and its version to be prepared. If not provided, then configuration from this object's constructor is used.
      * @returns Promise with `ApplicationWithVersion` in a result.
      */
-    async prepareApplicationFromConfiguration(applicationConfig: ApplicationConfig | undefined = undefined): Promise<ApplicationWithVersion> {
+    async prepareApplicationFromConfiguration(applicationConfig: ApplicationConfig | undefined = undefined): Promise<ApplicationSetup> {
         let appConfig = applicationConfig ?? this.config.application
-        if (appConfig == undefined) {
-            throw new PowerAuthServerError("Missing 'application' section in configuration")
-        }
-
-        let applicationName = appConfig.applicationName
-        let applicationVersionName = appConfig.applicationVersion ?? DEFAULT_APPLICATION_VERSION_NAME
+        let applicationName = appConfig?.applicationName ?? DEFAULT_APPLICATION_NAME
+        let applicationVersionName = appConfig?.applicationVersion ?? DEFAULT_APPLICATION_VERSION_NAME
 
         Logger.info(`Preparing application '${applicationName}' with version '${applicationVersionName}'`)
 
@@ -184,9 +209,150 @@ export class PowerAuthTestServer {
         if (!version.supported) {
             await this.setAppplicationVersionSupported(version, true)
         }
-        return {
-            application: applicationDetail,
-            applicationVersion: version
+        let appSetup = new ApplicationSetup(applicationDetail, version)
+        if (appConfig?.enableRecoveryCodes) {
+            let recoveryCodesConfig = await this.getRecoveryConfig(appSetup.application)
+            if (!recoveryCodesConfig.activationRecoveryEnabled) {
+                recoveryCodesConfig.activationRecoveryEnabled = true
+                await this.updateRecoveryConfig(recoveryCodesConfig)
+            }
         }
+        return appSetup
+    }
+
+    // Recovery
+
+    /**
+     * Get recovery config effective for given application.
+     * @param application Application object.
+     * @returns Promise with `RecoveryConfig` object in result.
+     */
+    async getRecoveryConfig(application: Application): Promise<RecoveryConfig> {
+        return await this.api.getRecoveryConfig(application)
+    }
+
+    /**
+     * Update recovery config for application specified in config object.
+     * @param recoveryConfig Recovery config to apply to the server.
+     * @returns Promise with boolean in result.
+     */
+    async updateRecoveryConfig(recoveryConfig: RecoveryConfig): Promise<boolean> {
+        return await this.api.updateRecoveryConfig(recoveryConfig)
+    }
+
+
+    // Activation management
+
+    /**
+     * Initialize activation for give application and user id. You can also specify other optional parameters,
+     * like OTP and maximum failure attempts value.
+     * @param application Application object.
+     * @param userId User identifier.
+     * @param otp Optional activation OTP.
+     * @param otpValidation Optional activation OTP validation mode, that must be provided together with OTP.
+     * @param maxFailureCount Optional maximum failure count. If not provided, value 5 will be used.
+     * @returns Promise with `Activation` object in result.
+     */
+     async activationInit(
+        application: Application,
+        userId: string,
+        otp: string | undefined = undefined,
+        otpValidation: ActivationOtpValidation | undefined = undefined,
+        maxFailureCount: number | undefined = DEFAULT_MAX_FAILED_ATTEMPTS
+    ): Promise<Activation> {
+        return await this.api.activationInit(application, userId, otp, otpValidation, maxFailureCount)
+    }
+    
+    /**
+     * Update activation OTP on the server.
+     * @param activation Activation object.
+     * @param otp New activation OTP.
+     * @param externalUserId Optional external user identifier.
+     * @returns Promise with boolean in result.
+     */
+    async activationUpdateOtp(
+        activation: Activation,
+        otp: string,
+        externalUserId: string | undefined = undefined
+    ): Promise<boolean> {
+        return await this.api.activationUpdateOtp(activation, otp, externalUserId)
+    }
+
+    /**
+     * Commit activation on the server.
+     * @param activation Activation object.
+     * @param otp Optional OTP, in case that OTP is expected in this phase.
+     * @param externalUserId Optional external user identifier.
+     * @returns Promise with boolean in result.
+     */
+    async activationCommit(
+        activation: Activation,
+        otp: string | undefined = undefined,
+        externalUserId: string | undefined = undefined
+    ): Promise<boolean> {
+        return await this.api.activationCommit(activation, otp, externalUserId)
+    }
+
+    /**
+     * Set activation blocked on the server.
+     * @param activation Activation object.
+     * @param reason Optional block reason.
+     * @param externalUserId Optional external user identifier.
+     * @returns Promise with boolean in result.
+     */
+    async activationBlock(
+        activation: Activation,
+        reason: string | undefined = undefined,
+        externalUserId: string | undefined = undefined
+    ): Promise<boolean> {
+        return await this.api.activationBlock(activation, reason, externalUserId) == ActivationStatus.BLOCKED
+    }
+
+    /**
+     * Set activation unblocked on the server.
+     * @param activation Activation object.
+     * @param externalUserId Optional external user identifier.
+     * @returns Promise with boolean in result.
+     */
+    async activationUnblock(
+        activation: Activation,
+        externalUserId: string | undefined = undefined
+    ): Promise<boolean> {
+        return await this.api.activationUnblock(activation, externalUserId) == ActivationStatus.ACTIVE
+    }
+
+    /**
+     * Remove activation on the server.
+     * @param activation Activation object.
+     * @param revokeRecoveryCodes If true, then also revoke recovery codes associated to this activation.
+     * @param externalUserId Optional external user identifier.
+     * @returns Promise with boolean in result.
+     */
+    async activationRemove(
+        activation: Activation,
+        revokeRecoveryCodes: boolean = true,
+        externalUserId: string | undefined = undefined
+    ): Promise<boolean> {
+        return await this.api.activationRemove(activation, revokeRecoveryCodes, externalUserId)
+    }
+
+    /**
+     * Get activation detail from the server.
+     * @param activation Activation object.
+     * @param challenge If provided, then also encrypted status blob V3.1 is returend.
+     * @returns Promise with `ActivationDetail` in result.
+     */
+    async getActivationDetil(activation: Activation, challenge: string | undefined = undefined): Promise<ActivationDetail> {
+        return await this.api.getActivationDetail(activation, challenge)
+    }
+
+    /**
+     * Prepare activation. This call is typically used in RESTful integration layer to process activation 
+     * request from the mobile SDK. The method is useful also for this library testing.
+     * @param data Activation data
+     * @returns Promise with `ActivationPrepareResult` in result.
+     */
+    async activationPrepare(data: ActivationPrepareData): Promise<ActivationPrepareResult> {
+        return await this.api.activationPrepare(data)
     }
 }

@@ -14,14 +14,19 @@
 // limitations under the License.
 //
 
-import { testServerConfiguration } from "./config";
-import { PowerAuthTestServer } from "../src/index";
+import { testServerConfiguration } from "./config/config";
+import { Config, PowerAuthTestServer } from "../src";
 
-const cfg = testServerConfiguration()
 
-describe('testing basic connection to localhost server', () => {
+describe('Manage PowerAuth applications', () => {
 
-    test('connection should succeed', async () => {
+    var cfg: Config
+
+    beforeAll(async () => {
+        cfg = await testServerConfiguration()
+    })
+
+    test('Basic connection should work', async () => {
         let server = new PowerAuthTestServer(cfg)
         let result = await server.testConnection()
         expect(result).toBe(true)
@@ -30,8 +35,8 @@ describe('testing basic connection to localhost server', () => {
     test('Create default application from default Config', async () => {
         let server = new PowerAuthTestServer(cfg)
         await server.connect()
-        let application = await server.prepareApplicationFromConfiguration()
-        expect(application).toBeDefined()
+        let appSetup = await server.prepareApplicationFromConfiguration()
+        expect(appSetup).toBeDefined()
     })
 
     test('Find unknown application', async () => {
@@ -62,19 +67,19 @@ describe('testing basic connection to localhost server', () => {
     test('Find unknown application version', async () => {
         let server = new PowerAuthTestServer(cfg)
         await server.connect()
-        let appWithVersion = await server.prepareApplicationFromConfiguration()
-        let version = server.findApplicationVersionByName(appWithVersion.application, "ApplicationVersionThatShouldNotExist")
+        let appSetup = await server.prepareApplicationFromConfiguration()
+        let version = server.findApplicationVersionByName(appSetup.applicationDetail, "ApplicationVersionThatShouldNotExist")
         expect(version).toBeUndefined()
     })
 
     test('Find known application version', async () => {
         let server = new PowerAuthTestServer(cfg)
         await server.connect()
-        let appWithVersion = await server.prepareApplicationFromConfiguration()
+        let appSetup = await server.prepareApplicationFromConfiguration()
 
-        appWithVersion.application.versions.forEach(it => {
+        appSetup.applicationDetail.versions.forEach(it => {
             let versionName = it.applicationVersionId.objectName
-            let result = server.findApplicationVersionByName(appWithVersion.application, versionName)
+            let result = server.findApplicationVersionByName(appSetup.applicationDetail, versionName)
             expect(result).toBeDefined()
             expect(result?.applicationVersionId.objectName).toEqual(versionName)
         })
@@ -83,9 +88,9 @@ describe('testing basic connection to localhost server', () => {
     test('Support application version', async () => {
         let server = new PowerAuthTestServer(cfg)
         await server.connect()
-        let appWithVersion = await server.prepareApplicationFromConfiguration()
-        expect(appWithVersion.applicationVersion.supported).toBe(true)
-        await server.setAppplicationVersionSupported(appWithVersion.applicationVersion, false)
-        await server.setAppplicationVersionSupported(appWithVersion.applicationVersion, true)
+        let appSetup = await server.prepareApplicationFromConfiguration()
+        expect(appSetup.applicationVersion.supported).toBe(true)
+        await server.setAppplicationVersionSupported(appSetup.applicationVersion, false)
+        await server.setAppplicationVersionSupported(appSetup.applicationVersion, true)
     })
 })

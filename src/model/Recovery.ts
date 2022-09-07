@@ -11,22 +11,23 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License.
 //
 
-import { Config, DEFAULT_APPLICATION_NAME, DEFAULT_APPLICATION_VERSION_NAME, DEFAULT_REQUEST_TIMEOUT } from "../src/model/Config";
+import { ObjectId } from "./ObjectId"
 
-const defaultLocalConfig: Config ={
-    connection: {
-        baseUrl: "http://localhost:8080/powerauth-java-server",
-        requestTimeout: DEFAULT_REQUEST_TIMEOUT
-    },
-    application: {
-        applicationName: DEFAULT_APPLICATION_NAME,
-        applicationVersion: DEFAULT_APPLICATION_VERSION_NAME
-    }
-}
+/**
+ * Object representing an activation recovery configuration effective
+ * for given application.
+ */
+ export interface RecoveryConfig {
+    applicationId: ObjectId
+    activationRecoveryEnabled: boolean
+    recoveryPostcardEnabled: boolean
 
-export function testServerConfiguration(): Config {
-    return defaultLocalConfig
+    allowMultipleRecoveryCodes?: boolean
+    remotePostcardPublicKey?: string
+    /**
+     * Ignored in updateRecoveryConfig().
+     */
+    postcardPublicKey?: string
 }

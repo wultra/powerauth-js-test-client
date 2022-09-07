@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-import { ActivationOtpValidation, ActivationStatus } from "../../model/Activation"
+import { ActivationDetail, ActivationOtpValidation, ActivationPrepareData, ActivationStatus } from "../../model/Activation"
 
 // Init
 
@@ -66,7 +66,7 @@ export interface ActivationCommit_Response {
 export interface ActivationBlock_Request {
     activationId: string
     externalUserId?: string
-    reason: string
+    reason?: string
 }
 
 export interface ActivationBlock_Response {
@@ -84,4 +84,41 @@ export interface ActivationUnblock_Request {
 export interface ActivationUnblock_Response {
     activationId: string
     activationStatus: ActivationStatus
+}
+
+// Remove
+
+export interface ActivationRemove_Request {
+    activationId: string
+    externalUserId?: string
+    revokeRecoveryCodes: boolean
+}
+
+export interface ActivationRemove_Response {
+    activationId: string
+    removed: boolean
+}
+
+// Detail (e.g. status)
+
+export interface ActivationStatus_Request {
+    activationId: string
+    challenge?: string
+}
+
+export interface ActivationStatus_Response extends ActivationDetail {
+}
+
+// Prepare
+
+export interface ActivationPrepare_Request extends ActivationPrepareData {
+}
+
+export interface ActivationPrepare_Response {
+    applicationId: number
+    activationId: string
+    activationStatus: ActivationStatus
+    userId: string
+    encryptedData: string
+    mac: string
 }

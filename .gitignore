@@ -32,3 +32,6 @@ pids
 # dotenv environment variables file
 .env
 .env.test
+
+# tests
+coverage

@@ -99,7 +99,21 @@ export interface ApplicationVersion {
 /**
  * Object representing an exact combination of application and its version.
  */
-export interface ApplicationWithVersion {
-    application: ApplicationDetail
-    applicationVersion: ApplicationVersion
+export class ApplicationSetup {
+    readonly application: Application
+    readonly applicationDetail: ApplicationDetail
+    readonly applicationVersion: ApplicationVersion
+
+    readonly appKey: string
+    readonly appSecret: string
+    readonly masterServerPublicKey: string
+
+    constructor(applicationDetail: ApplicationDetail, applicationVersion: ApplicationVersion) {
+        this.applicationDetail = applicationDetail
+        this.applicationVersion = applicationVersion
+        this.application = Application.fromDetail(applicationDetail)
+        this.appKey = applicationVersion.applicationKey
+        this.appSecret = applicationVersion.applicationSecret
+        this.masterServerPublicKey = applicationDetail.masterPublicKey
+    }
 }

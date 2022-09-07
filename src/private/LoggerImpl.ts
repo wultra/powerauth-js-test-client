@@ -52,13 +52,13 @@ export class PrettyLogger implements AbstractLogger {
     }
 
     info(message: string): void {
-        console.log(`${this.infoStr} ${this.tag}: ${message}`)
+        console.log(`${this.infoStr} ${this.tag} ${message}`)
     }
     warning(message: string): void {
-        console.log(`${this.warnStr} ${this.tag}: ${message}`)
+        console.log(`${this.warnStr} ${this.tag} ${message}`)
     }
     error(message: string): void {
-        console.log(`${this.errStr} ${this.tag}: ${message}`)
+        console.log(`${this.errStr} ${this.tag} ${message}`)
     }
 
     request(url: string, method: string, body: any, headers: HeadersInit) {

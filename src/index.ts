@@ -28,4 +28,9 @@ export * from './model/Application';
 export * from './model/Version';
 export * from './model/Config';
 export * from './model/ObjectId';
+export * from './model/Recovery';
 export * from './model/SystemStatus';
+
+// Helpers
+
+export * from './helpers/ActivationHelper';

@@ -1,0 +1,47 @@
+{
+	"testVectors": [
+        {
+            "masterSecretKey": "H0eFgDSODwztB6kypY920A==",
+            "signaturePossessionKey": "x13RSfgIgsmbNe8M7dz2lg==",
+            "signatureKnowledgeKey": "sTXzoFkvv0g0ZviwKRH5Tg==",
+            "signatureBiometryKey": "WHR0b7eUWLqE8BvQozNvyg==",
+            "transportKey": "SwqX1DalSONoFaC+hA4eUA==",
+            "vaultEncryptionKey": "7E5o4RYWqgImz/lAv8XvSg=="
+        }, {
+            "masterSecretKey": "Gz4q6c5PIq1FnvcbUw6lng==",
+            "signaturePossessionKey": "l+u1De8sM1KP/itPRcSopg==",
+            "signatureKnowledgeKey": "wkgTXPkKCG8tT8zUrC2uvA==",
+            "signatureBiometryKey": "VQsCKztoc0YFXZ2mQQ0/ZA==",
+            "transportKey": "XllDr//G4QSW5yO6pbvQbQ==",
+            "vaultEncryptionKey": "zDsl5hPmyB1wOWZ9OVoyOA=="
+        }, {
+            "masterSecretKey": "SxgwZ/paKQw0q+ODV0wGbQ==",
+            "signaturePossessionKey": "ykLxX0S0ITUiKNA/6STwxA==",
+            "signatureKnowledgeKey": "rr4RNvjeXvPhM8eePRCSqw==",
+            "signatureBiometryKey": "0AMAqjveNYY6xcrSuE7TCw==",
+            "transportKey": "rb6rmOtDv4x3Ajp4fD/JSQ==",
+            "vaultEncryptionKey": "+tceU5jZTSXIh56cRKu97Q=="
+        }, {
+            "masterSecretKey": "7pmpW1/PyKdXFy2zkB8Etg==",
+            "signaturePossessionKey": "fYjo6r3NSPv311WkG8Urdg==",
+            "signatureKnowledgeKey": "9eaFaQPjM13Rg7fKp+V7Fw==",
+            "signatureBiometryKey": "H7WuOdZDy+M2jMNuymVHvA==",
+            "transportKey": "ONLQjRjtnuFWu/q/tB/AUg==",
+            "vaultEncryptionKey": "IRG6UcZHur06cUDXA4vT6g=="
+        }, {
+            "masterSecretKey": "4+f8o62IQoV1aw0vK1ahpg==",
+            "signaturePossessionKey": "IsDgW+W6kc2twWYro2skoA==",
+            "signatureKnowledgeKey": "frhxuB9BKYMdvoCpaF3EHg==",
+            "signatureBiometryKey": "cQo1Smn7t3tNpZuW6cliLA==",
+            "transportKey": "sBfftXQzTX/YLhhd524QhQ==",
+            "vaultEncryptionKey": "uz0ynVxPEcK+9/WJOL4cEg=="
+        }, {
+            "masterSecretKey": "PUFun7M0q/Ivi4SfciVacQ==",
+            "signaturePossessionKey": "JqTn+DuzK437WVeV7Y/YLQ==",
+            "signatureKnowledgeKey": "2r8Fm/gbLX+/vv0Qd9rz3Q==",
+            "signatureBiometryKey": "lGZ//wjcYo1WkZgHePXGCQ==",
+            "transportKey": "k4o+8rl8t8MrqcY1l0xbIg==",
+            "vaultEncryptionKey": "2nPmLpQERvGnNk1+8l9JJw=="
+        }
+    ]
+}

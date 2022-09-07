@@ -31,4 +31,9 @@ export class Endpoints {
     static readonly activationBlock: Endpoint           = { path: '/v3/activation/block' }
     static readonly activationUnblock: Endpoint         = { path: '/v3/activation/unblock' }
     static readonly activationUpdateOtp: Endpoint       = { path: '/v3/activation/otp/update' }
+    static readonly activationDetail: Endpoint          = { path: '/v3/activation/status' }
+    static readonly activationPrepare: Endpoint          = { path: '/v3/activation/prepare' }
+
+    static readonly recoveryConfigDetail: Endpoint      = { path: '/v3/recovery/config/detail' }
+    static readonly recoveryConfigUpdate: Endpoint      = { path: '/v3/recovery/config/update' }
 }

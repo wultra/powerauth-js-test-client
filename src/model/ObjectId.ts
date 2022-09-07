@@ -58,7 +58,7 @@ export class ObjectId {
      * @param objectName Optional object name. If name is not available, then it's created from legacy identifier.
      * @returns ObjectId created from legacy data.
      */
-    static fromV10Data(legacyId: number, objectName: string | undefined): ObjectId {
+    static fromV10Data(legacyId: number, objectName: string | undefined = undefined): ObjectId {
         return new ObjectId(objectName == undefined ? legacyId.toString() : objectName, undefined, legacyId)
     }
 

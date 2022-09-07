@@ -17,7 +17,7 @@
 import { fetch } from "cross-fetch";
 import { Base64 } from "js-base64";
 import { Logger } from "../Logger";
-import { Config, ConnectionConfig } from "../model/Config";
+import { Config, ConnectionConfig, DEFAULT_REQUEST_TIMEOUT } from "../model/Config";
 import { PowerAuthServerError } from "../PowerAuthServerError";
 import { Endpoint } from "./Endpoint";
 import { TimeoutHandler } from "./TimeoutHandler";
@@ -71,10 +71,10 @@ export class HttpClient {
         let requestObject: RequestObject<TRequest> = { requestObject: request }
         let headers = this.defaultHeaders
         
-        Logger.request(url, "POST", request, headers)
+        Logger.request(url, "POST", requestObject, headers)
 
         // fetch data from remote location
-        let timeout = new TimeoutHandler(this.config.connection.requestTimeout)
+        let timeout = new TimeoutHandler(this.config.connection.requestTimeout ?? DEFAULT_REQUEST_TIMEOUT)
         let response: Response
         let plainResponseObject: PlainResponse
         let statusCode: number
@@ -116,11 +116,12 @@ export class HttpClient {
         // Throw an error
         let errorResponse = plainResponseObject as ResponseObject<ErrorResponse>
         if (errorResponse.responseObject == undefined) {
+            if (statusCode == 401)
             throw new PowerAuthServerError(`No error response returned from the server. Status = ${statusCode}`, statusCode)
         }
         // Throw an error
-        let code = errorResponse.responseObject.code ?? '<<null-code>>'
-        let message = errorResponse.responseObject.message ?? '<<null-message>>'
+        let code = errorResponse.responseObject?.code ?? '<<null-code>>'
+        let message = errorResponse.responseObject?.message ?? '<<null-message>>'
         throw new PowerAuthServerError(`Server returned error ${code}, message '${message}'. Status = ${statusCode}`, statusCode)
     }
 

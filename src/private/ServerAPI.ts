@@ -14,10 +14,21 @@
 // limitations under the License.
 //
 
-import { Application, ApplicationDetail, ApplicationVersion } from "../model/Application"
-import { Config } from "../model/Config"
-import { SystemStatus } from "../model/SystemStatus"
-import { ServerVersion } from "../model/Version"
+import {
+    Activation,
+    ActivationDetail,
+    ActivationOtpValidation,
+    ActivationPrepareData,
+    ActivationPrepareResult,
+    ActivationStatus,
+    Application,
+    ApplicationDetail,
+    ApplicationVersion,
+    Config,
+    RecoveryConfig,
+    ServerVersion,
+    SystemStatus
+ } from "../index"
 
 export interface ServerAPI {
 
@@ -86,5 +97,120 @@ export interface ServerAPI {
      * @returns Promise with updated `ApplicationVersion` object in result.
      */
     setAppplicationVersionSupported(applicationVersion: ApplicationVersion, supported: boolean): Promise<boolean>
+
+    // Recovery
+
+    /**
+     * Get recovery config effective for given application.
+     * @param application Application object.
+     * @returns Promise with `RecoveryConfig` object in result.
+     */
+    getRecoveryConfig(application: Application): Promise<RecoveryConfig>
+
+    /**
+     * Update recovery config for application specified in config object.
+     * @param recoveryConfig Recovery config to apply to the server.
+     * @returns Promise with boolean in result.
+     */
+    updateRecoveryConfig(recoveryConfig: RecoveryConfig): Promise<boolean>
+    
+    // Activation management
+
+    /**
+     * Initialize activation for give application and user id. You can also specify other optional parameters,
+     * like OTP and maximum failure attempts value.
+     * @param application Application object.
+     * @param userId User identifier.
+     * @param otp Optional activation OTP.
+     * @param otpValidation Optional activation OTP validation mode, that must be provided together with OTP.
+     * @param maxFailureCount Optional maximum failure count. If not provided, value 5 will be used.
+     * @returns Promise with `Activation` object in result.
+     */
+    activationInit(
+        application: Application,
+        userId: string,
+        otp: string | undefined,
+        otpValidation: ActivationOtpValidation | undefined,
+        maxFailureCount: number | undefined
+    ): Promise<Activation>
+    
+    /**
+     * Update activation OTP on the server.
+     * @param activation Activation object.
+     * @param otp New activation OTP.
+     * @param externalUserId Optional external user identifier.
+     * @returns Promise with boolean in result.
+     */
+    activationUpdateOtp(
+        activation: Activation,
+        otp: string,
+        externalUserId: string | undefined
+    ): Promise<boolean>
+
+    /**
+     * Commit activation on the server.
+     * @param activation Activation object.
+     * @param otp Optional OTP, in case that OTP is expected in this phase.
+     * @param externalUserId Optional external user identifier.
+     * @returns Promise with boolean in result.
+     */
+    activationCommit(
+        activation: Activation,
+        otp: string | undefined,
+        externalUserId: string | undefined
+    ): Promise<boolean>
+
+    /**
+     * Set activation blocked on the server.
+     * @param activation Activation object.
+     * @param reason Optional block reason.
+     * @param externalUserId Optional external user identifier.
+     * @returns Promise with boolean in result.
+     */
+    activationBlock(
+        activation: Activation,
+        reason: string | undefined,
+        externalUserId: string | undefined
+    ): Promise<ActivationStatus>
+
+    /**
+     * Set activation unblocked on the server.
+     * @param activation Activation object.
+     * @param externalUserId Optional external user identifier.
+     * @returns Promise with boolean in result.
+     */
+    activationUnblock(
+        activation: Activation,
+        externalUserId: string | undefined
+    ): Promise<ActivationStatus>
+
+    /**
+     * Remove activation on the server.
+     * @param activation Activation object.
+     * @param revokeRecoveryCodes If true, then also revoke recovery codes associated to this activation.
+     * @param externalUserId Optional external user identifier.
+     * @returns Promise with boolean in result.
+     */
+    activationRemove(
+        activation: Activation,
+        revokeRecoveryCodes: boolean,
+        externalUserId: string | undefined
+    ): Promise<boolean>
+
+    /**
+     * Get activation detail from the server.
+     * @param activation Activation object.
+     * @param challenge If provided, then also encrypted status blob V3.1 is returend.
+     * @returns Promise with `ActivationDetail` in result.
+     */
+    getActivationDetail(activation: Activation, challenge: string | undefined): Promise<ActivationDetail>
+
+    /**
+     * Prepare activation. This call is typically used in RESTful integration layer to process activation 
+     * request from the mobile SDK. The method is useful also for this library testing.
+     * @param data Activation data
+     * @returns Promise with `ActivationPrepareResult` in result.
+     */
+    activationPrepare(data: ActivationPrepareData): Promise<ActivationPrepareResult>
 }
 

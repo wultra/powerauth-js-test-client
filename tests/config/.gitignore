@@ -1,0 +1,4 @@
+# Ignore test-config.json
+test-config.json
+# Ignore possible other config files in this folder
+*config.json

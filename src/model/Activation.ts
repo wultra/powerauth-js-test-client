@@ -22,23 +22,23 @@ export enum ActivationStatus {
     /**
      * Activation is just created.
      */
-    CREATED,
+    CREATED = "CREATED",
     /**
      * Activation is waiting for commit.
      */
-    PENDING_COMMIT,
+    PENDING_COMMIT = "PENDING_COMMIT",
     /**
      * Activation is active.
      */
-    ACTIVE,
+    ACTIVE = "ACTIVE",
     /**
      * Activation is blocked.
      */
-    BLOCKED,
+    BLOCKED = "BLOCKED",
     /**
      * Activation is removed.
      */
-    REMOVED
+    REMOVED = "REMOVED"
 }
 
 /**
@@ -48,15 +48,15 @@ export enum ActivationOtpValidation {
     /**
      * No OTP validation is used.
      */
-    NONE,
+    NONE = "NONE",
     /**
      * OTP is validated during the key-exchange phase.
      */
-    ON_KEY_EXCHANGE,
+    ON_KEY_EXCHANGE = "ON_KEY_EXCHANGE",
     /**
      * OTP is validated on activation commit.
      */
-    ON_COMMIT
+    ON_COMMIT = "ON_COMMIT"
 }
 
 /**
@@ -98,4 +98,28 @@ export interface ActivationDetail {
     devicePublicKeyFingerprint?: string
 
     protocolVersion?: number
+}
+
+/**
+ * Object representing data for activation prepare
+ */
+export interface ActivationPrepareData {
+    activationCode: string
+    applicationKey: string
+    ephemeralPublicKey: string
+    encryptedData: string
+    mac: string
+    nonce?: string
+}
+
+/**
+ * Object representing data returned from activation prepare.
+ */
+ export interface ActivationPrepareResult {
+    applicationId: ObjectId
+    activationId: string
+    activationStatus: ActivationStatus
+    userId: string
+    encryptedData: string
+    mac: string
 }
