@@ -3,5 +3,5 @@
         "resolveJsonModule": true
     },
     "extends": "./tsconfig.json",
-    "include": [ "tests/**/*.ts", "tests/**/*.json", "tests/**/*.js" ]
+    "include": [ "tests/**/*.ts" ]
 }
