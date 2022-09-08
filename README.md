@@ -88,6 +88,7 @@ async function getActivationHelper(): Promise<RNActivationHelper> {
  * Function prepare activation to active state.
  */
 async function prepareActivationWithHelper(prepareData: ActivationHelperPrepareData): Promise<RNActivationHelper> {
+    let config = { connection: { baseUrl: PA_SERVER_URL }}
     let helper = await createActivationHelper(config, prepareData)
     await helper.createActivation(helper.userId, prepareData)
     return helper
