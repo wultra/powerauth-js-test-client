@@ -34,8 +34,8 @@ import * as AesKdfTestData from './test-data/aes-kdf.json';
 describe('Test PowerAuth protocol utils', () => {
     test('Test AES-KDF', () => {
         AesKdfTestData.testVectors.forEach(td => {
-            let masterSecret = Buffer.from(td.masterSecretKey, 'base64')
-            let derived = deriveAllSecretKeys(masterSecret)
+            const masterSecret = Buffer.from(td.masterSecretKey, 'base64')
+            const derived = deriveAllSecretKeys(masterSecret)
             expect(derived.possessionKey.toString('base64')).toEqual(td.signaturePossessionKey)
             expect(derived.knowledgeKey.toString('base64')).toEqual(td.signatureKnowledgeKey)
             expect(derived.biometryKey.toString('base64')).toEqual(td.signatureBiometryKey)

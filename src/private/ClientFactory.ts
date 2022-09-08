@@ -28,9 +28,9 @@ export class ClientFactory {
      * @returns Object implementing PowerAuthServerAPI
      */
     static async createTestServerApi(config: Config): Promise<ServerAPI> {
-        let connection = config.connection
+        const connection = config.connection
         Logger.info(`Connecting to PowerAuth Server located at ${connection.baseUrl}`)
-        let client = new HttpClient(config)
+        const client = new HttpClient(config)
         let api: ServerAPI
         if (connection.serverVersion?.version != undefined) {
             // Server's version is known, so try to create API from config directly.
@@ -39,7 +39,7 @@ export class ClientFactory {
             await api.getServerVersion()
         } else {
             // Server's version is not known, so get status first.
-            let status = await getSystemStatus(client, true)
+            const status = await getSystemStatus(client, true)
             // Now create API depeneding on version received in status.
             api = this.createServerForKnownVersion(client, config, status.version)
         }
@@ -55,7 +55,7 @@ export class ClientFactory {
      * @returns Object implementing PowerAuthServerAPI.
      */
     private static createServerForKnownVersion(client: HttpClient, config: Config, versionString: string): ServerAPI {
-        let version = ServerVersion.fromString(versionString)
+        const version = ServerVersion.fromString(versionString)
         let api: ServerAPI
         if (version.numericVersion <= ServerVersion.V1_2_5.numericVersion) {
             Logger.info(`Creating interface for servers 1.0.x up to 1.2.x`)

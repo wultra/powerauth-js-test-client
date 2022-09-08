@@ -20,43 +20,43 @@ import { Config, PowerAuthTestServer } from "../src";
 
 describe('Manage PowerAuth applications', () => {
 
-    var cfg: Config
+    let cfg: Config
 
     beforeAll(async () => {
         cfg = await testServerConfiguration()
     })
 
     test('Basic connection should work', async () => {
-        let server = new PowerAuthTestServer(cfg)
-        let result = await server.testConnection()
+        const server = new PowerAuthTestServer(cfg)
+        const result = await server.testConnection()
         expect(result).toBe(true)
     })
 
     test('Create default application from default Config', async () => {
-        let server = new PowerAuthTestServer(cfg)
+        const server = new PowerAuthTestServer(cfg)
         await server.connect()
-        let appSetup = await server.prepareApplicationFromConfiguration()
+        const appSetup = await server.prepareApplicationFromConfiguration()
         expect(appSetup).toBeDefined()
     })
 
     test('Find unknown application', async () => {
-        let server = new PowerAuthTestServer(cfg)
+        const server = new PowerAuthTestServer(cfg)
         await server.connect()
-        let application = await server.findApplicationByName("ApplicationNameThatShouldNotExist")
+        const application = await server.findApplicationByName("ApplicationNameThatShouldNotExist")
         expect(application).toBeUndefined()
     })
 
     test('Find known application', async () => {
-        let server = new PowerAuthTestServer(cfg)
+        const server = new PowerAuthTestServer(cfg)
         await server.connect()
-        var appList = await server.getApplicationList()
+        let appList = await server.getApplicationList()
         if (appList.length == 0) {
             await server.prepareApplicationFromConfiguration()
             appList = await server.getApplicationList()
             expect(appList.length).toBeGreaterThan(0)
         }
         // find first and last app
-        var app = await server.findApplicationByName(appList[0].applicationName)
+        let app = await server.findApplicationByName(appList[0].applicationName)
         expect(app).toBeDefined()
         expect(app?.applicationName).toEqual(appList[0].applicationName)
         app = await server.findApplicationByName(appList[appList.length - 1].applicationName)
@@ -65,30 +65,30 @@ describe('Manage PowerAuth applications', () => {
     })
 
     test('Find unknown application version', async () => {
-        let server = new PowerAuthTestServer(cfg)
+        const server = new PowerAuthTestServer(cfg)
         await server.connect()
-        let appSetup = await server.prepareApplicationFromConfiguration()
-        let version = server.findApplicationVersionByName(appSetup.applicationDetail, "ApplicationVersionThatShouldNotExist")
+        const appSetup = await server.prepareApplicationFromConfiguration()
+        const version = server.findApplicationVersionByName(appSetup.applicationDetail, "ApplicationVersionThatShouldNotExist")
         expect(version).toBeUndefined()
     })
 
     test('Find known application version', async () => {
-        let server = new PowerAuthTestServer(cfg)
+        const server = new PowerAuthTestServer(cfg)
         await server.connect()
-        let appSetup = await server.prepareApplicationFromConfiguration()
+        const appSetup = await server.prepareApplicationFromConfiguration()
 
         appSetup.applicationDetail.versions.forEach(it => {
-            let versionName = it.applicationVersionId.objectName
-            let result = server.findApplicationVersionByName(appSetup.applicationDetail, versionName)
+            const versionName = it.applicationVersionId.objectName
+            const result = server.findApplicationVersionByName(appSetup.applicationDetail, versionName)
             expect(result).toBeDefined()
             expect(result?.applicationVersionId.objectName).toEqual(versionName)
         })
     })
 
     test('Support application version', async () => {
-        let server = new PowerAuthTestServer(cfg)
+        const server = new PowerAuthTestServer(cfg)
         await server.connect()
-        let appSetup = await server.prepareApplicationFromConfiguration()
+        const appSetup = await server.prepareApplicationFromConfiguration()
         expect(appSetup.applicationVersion.supported).toBe(true)
         await server.setAppplicationVersionSupported(appSetup.applicationVersion, false)
         await server.setAppplicationVersionSupported(appSetup.applicationVersion, true)

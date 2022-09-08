@@ -55,7 +55,7 @@ export class Logger {
      * @param tag If provided, then new tag will be used for all messages. 
      */
     static setPretty(pretty: boolean, tag: string | undefined) {
-        let newTag = tag ?? this.TAG
+        const newTag = tag ?? this.TAG
         if (pretty) {
             this.logImpl = new DefaultLogger(newTag)
         } else {
@@ -103,12 +103,12 @@ export class Logger {
     static exception(exception: any) {
         if (this.verboseLevel >= VerboseLevel.Error) {
             if (exception instanceof PowerAuthServerError) {
-                let stack = !exception.stack ? "" : `, Stack = ${exception.stack}`
+                const stack = !exception.stack ? "" : `, Stack = ${exception.stack}`
                 this.error(`${exception.name}: ${exception.message}${stack}`)
             } else {
-                let error = exception as Error
+                const error = exception as Error
                 if (error.name != undefined && error.message != undefined) {
-                    let stack = !error.stack ? "" : `, Stack = ${error.stack}`
+                    const stack = !error.stack ? "" : `, Stack = ${error.stack}`
                     this.error(`${error.name}: ${error.message}${stack}`)
                 } else {
                     // Fallback

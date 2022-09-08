@@ -38,7 +38,7 @@ export const HASH_NAME = 'sha256'
 export const HASH_LENGTH = 32
 
 export function SHA256(data: Buffer): Buffer {
-    let hash = createHash(HASH_NAME)
+    const hash = createHash(HASH_NAME)
     hash.update(data)
     return hash.digest()
 }
@@ -47,9 +47,9 @@ export function SHA256(data: Buffer): Buffer {
 // MAC
 
 export function HMAC_SHA256(key: Buffer, data: Buffer, macLength: number = HASH_LENGTH): Buffer {
-    let hmac = createHmac(HASH_NAME, key)
+    const hmac = createHmac(HASH_NAME, key)
     hmac.update(data)
-    var result = hmac.digest()
+    let result = hmac.digest()
     if (macLength < HASH_LENGTH) {
         result = result.subarray(0, macLength)
     }
@@ -62,14 +62,14 @@ export function HMAC_SHA256(key: Buffer, data: Buffer, macLength: number = HASH_
 const AES_CBC = 'aes-128-cbc'
 
 export function AES128_CBC_PKCS7_Encrypt(key: Buffer, iv: Buffer, plaintext: Buffer): Buffer {
-    let cipher = createCipheriv(AES_CBC, key, iv)
-    let buffers = [ cipher.update(plaintext), cipher.final() ]
+    const cipher = createCipheriv(AES_CBC, key, iv)
+    const buffers = [ cipher.update(plaintext), cipher.final() ]
     return Buffer.concat(buffers)
 }
 
 export function AES128_CBC_PKCS7_Decrypt(key: Buffer, iv: Buffer, ciphertext: Buffer): Buffer {
-    let cipher = createDecipheriv(AES_CBC, key, iv)
-    let buffers = [ cipher.update(ciphertext), cipher.final() ]
+    const cipher = createDecipheriv(AES_CBC, key, iv)
+    const buffers = [ cipher.update(ciphertext), cipher.final() ]
     return Buffer.concat(buffers)
 }
 
@@ -77,12 +77,12 @@ export function AES128_CBC_PKCS7_Decrypt(key: Buffer, iv: Buffer, ciphertext: Bu
 // Key derivation
 
 export function KDF_X9_63_SHA256(secret: Buffer, info1: Buffer, keySize: number): Buffer {
-    var result = Buffer.allocUnsafe(0)
-    var counter = 1
+    let result = Buffer.allocUnsafe(0)
+    let counter = 1
     while (result.length < keySize) {
-        let counterBytes = Buffer.allocUnsafe(4)
+        const counterBytes = Buffer.allocUnsafe(4)
         counterBytes.writeUInt32BE(counter)
-        let iteration = SHA256(Buffer.concat([secret, counterBytes, info1]))
+        const iteration = SHA256(Buffer.concat([secret, counterBytes, info1]))
         result = Buffer.concat([result, iteration])
         counter++
     }
@@ -92,12 +92,12 @@ export function KDF_X9_63_SHA256(secret: Buffer, info1: Buffer, keySize: number)
 export function AES_KDF(secret: Buffer, index: number): Buffer {
     // Currently, we don't use indexes greater than 2^32, so we can be tricky here
     // and store 64 bit counter in two steps.
-    let zero = Buffer.alloc(12)
-    let indexData = Buffer.allocUnsafe(4)
+    const zero = Buffer.alloc(12)
+    const indexData = Buffer.allocUnsafe(4)
     indexData.writeUint32BE(index)
-    let key = Buffer.concat([zero, indexData])
-    let cipher = createCipheriv('aes-128-ecb', secret, null)
-    let result = cipher.update(key)
+    const key = Buffer.concat([zero, indexData])
+    const cipher = createCipheriv('aes-128-ecb', secret, null)
+    const result = cipher.update(key)
     cipher.final()
     return result
 }
@@ -132,13 +132,13 @@ export class EcKeyPair {
     }
 
     static create(): EcKeyPair {
-        let keyPair = createECDH(EC_CURVE_NAME)
+        const keyPair = createECDH(EC_CURVE_NAME)
         keyPair.generateKeys()
         return new EcKeyPair(keyPair)
     }
 
     static import(privateKey: Buffer): EcKeyPair {
-        let keyPair = createECDH(EC_CURVE_NAME)
+        const keyPair = createECDH(EC_CURVE_NAME)
         keyPair.setPrivateKey(privateKey)
         return new EcKeyPair(keyPair)
     }

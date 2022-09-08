@@ -105,7 +105,7 @@ export class ActivationHelper<SDK, PrepareResult> {
         applicationConfig: ApplicationConfig | undefined = undefined,
     ): Promise<ActivationHelper<SDK, PrepareResult>> {
         await server.connect()
-        let appSetup = await server.prepareApplicationFromConfiguration(applicationConfig)
+        const appSetup = await server.prepareApplicationFromConfiguration(applicationConfig)
         return new ActivationHelper(server, appSetup)
     }
 
@@ -214,7 +214,7 @@ export class ActivationHelper<SDK, PrepareResult> {
         otpValidation: ActivationOtpValidation | undefined = undefined,
         maxFailureCount: number = DEFAULT_MAX_FAILED_ATTEMPTS
     ): Promise<Activation> {
-        let activation = await this.server.activationInit(this.application, userId, otp, otpValidation, maxFailureCount)
+        const activation = await this.server.activationInit(this.application, userId, otp, otpValidation, maxFailureCount)
         this.activationData = activation
         return activation
     }
@@ -248,7 +248,7 @@ export class ActivationHelper<SDK, PrepareResult> {
      * @returns Promise with void.
      */
     async commitActivation(otp: string | undefined = undefined, externalUserId: string | undefined = undefined): Promise<void> {
-        let result = await this.withActivation(activation => this.server.activationCommit(activation, otp, externalUserId))
+        const result = await this.withActivation(activation => this.server.activationCommit(activation, otp, externalUserId))
         if (!result) throw new Error('Failed to comit activation')
     }
 
@@ -264,11 +264,11 @@ export class ActivationHelper<SDK, PrepareResult> {
         prepareData: ActivationHelperPrepareData | undefined = undefined,
         maxFailureCount: number = DEFAULT_MAX_FAILED_ATTEMPTS
     ): Promise<Activation> {
-        let otpValidation = prepareData?.otpValidation
-        let otp = otpValidation == ActivationOtpValidation.ON_COMMIT ? prepareData?.otp : undefined
-        let activation = await this.initActivation(userId, otp, otpValidation, maxFailureCount)
+        const otpValidation = prepareData?.otpValidation
+        const otp = otpValidation == ActivationOtpValidation.ON_COMMIT ? prepareData?.otp : undefined
+        const activation = await this.initActivation(userId, otp, otpValidation, maxFailureCount)
         await this.prepareActivationImpl(activation, prepareData)
-        let status = await this.getActivationStatus()
+        const status = await this.getActivationStatus()
         if (status == ActivationStatus.PENDING_COMMIT) {
             await this.commitActivation(otp)
         } else if (status != ActivationStatus.ACTIVE) {
@@ -285,7 +285,7 @@ export class ActivationHelper<SDK, PrepareResult> {
      */
     async removeActivation(revokeRecoveryCodes: boolean = true, externalUserId: string | undefined = undefined): Promise<void> {
         return await this.withActivation(async activation => {
-            let removed = await this.server.activationRemove(activation, revokeRecoveryCodes, externalUserId)
+            const removed = await this.server.activationRemove(activation, revokeRecoveryCodes, externalUserId)
             if (!removed) throw new Error('Failed to remove activation')
         })
     }
@@ -298,7 +298,7 @@ export class ActivationHelper<SDK, PrepareResult> {
      */
     async blockActivation(reason: string | undefined = undefined, externalUserId: string | undefined = undefined): Promise<void> {
         return await this.withActivation(async activation => {
-            let blocked = await this.server.activationBlock(activation, reason, externalUserId)
+            const blocked = await this.server.activationBlock(activation, reason, externalUserId)
             if (!blocked) throw new Error('Failed to block activation')
         })
     }
@@ -310,7 +310,7 @@ export class ActivationHelper<SDK, PrepareResult> {
      */
     async unblockActivation(externalUserId: string | undefined = undefined): Promise<void> {
         return await this.withActivation(async activation => {
-            let active = await this.server.activationUnblock(activation, externalUserId)
+            const active = await this.server.activationUnblock(activation, externalUserId)
             if (!active) throw new Error('Failed to unblock activation')
         })
     }

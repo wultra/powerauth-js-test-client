@@ -62,18 +62,18 @@ export class PrettyLogger implements AbstractLogger {
     }
 
     request(url: string, method: string, body: any, headers: HeadersInit) {
-        let colorUrl = this.highlightUrl(url)
-        let colorMethod = chalk.green(method.toUpperCase())
-        let colorHeaders = chalk.gray.dim("  Headers ") + chalk.blackBright(JSON.stringify(headers))
-        let colorBody    = chalk.gray.dim("     Body ") + chalk.blackBright(JSON.stringify(body))
+        const colorUrl = this.highlightUrl(url)
+        const colorMethod = chalk.green(method.toUpperCase())
+        const colorHeaders = chalk.gray.dim("  Headers ") + chalk.blackBright(JSON.stringify(headers))
+        const colorBody    = chalk.gray.dim("     Body ") + chalk.blackBright(JSON.stringify(body))
         console.log(`${this.infoStr} ${this.tag} ${colorMethod} >> ${colorUrl}\n${colorHeaders}\n${colorBody}`)
     }
 
     response(url: string, data: any, headers: HeadersInit, status: number) {
-        let colorUrl = this.highlightUrl(url)
-        let colorStatus = status / 100 == 2 ? chalk.green(status) : chalk.redBright(status)
-        let colorHeaders = chalk.gray.dim("  Headers ") + chalk.blackBright(JSON.stringify(headers))
-        let colorBody    = chalk.gray.dim("     Data ") + chalk.blackBright(JSON.stringify(data))
+        const colorUrl = this.highlightUrl(url)
+        const colorStatus = status / 100 == 2 ? chalk.green(status) : chalk.redBright(status)
+        const colorHeaders = chalk.gray.dim("  Headers ") + chalk.blackBright(JSON.stringify(headers))
+        const colorBody    = chalk.gray.dim("     Data ") + chalk.blackBright(JSON.stringify(data))
         console.log(`${this.infoStr} ${this.tag} ${colorStatus} << ${colorUrl}\n${colorHeaders}\n${colorBody}`)
     }
 
@@ -107,14 +107,14 @@ export class DefaultLogger implements AbstractLogger {
     }
     
     request(url: string, method: string, body: any, headers: HeadersInit) {
-        let strHeaders = "- Headers  : " + JSON.stringify(headers)
-        let strData    = "- Body     : " + JSON.stringify(body)
+        const strHeaders = "- Headers  : " + JSON.stringify(headers)
+        const strData    = "- Body     : " + JSON.stringify(body)
         console.log(`${DEBUG_STR} ${this.tag} ${method.toUpperCase()}  >> ${url}\n${strHeaders}\n${strData}}`)
     }
 
     response(url: string, data: any, headers: HeadersInit, status: number) {
-        let strHeaders = "- Headers  : " + JSON.stringify(headers)
-        let strData    = "- Response : " + JSON.stringify(data)
+        const strHeaders = "- Headers  : " + JSON.stringify(headers)
+        const strData    = "- Response : " + JSON.stringify(data)
         console.log(`${DEBUG_STR} ${this.tag} ${status} << ${url}\n${strHeaders}\n${strData}}`)
     }
 }

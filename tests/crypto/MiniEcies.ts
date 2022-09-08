@@ -54,20 +54,20 @@ export class EciesEnvelopeKey {
     }
 
     static fromPublicKey(publicKey: Buffer, sh1: Buffer): EciesEnvelopeKey {
-        let ephemeralKeyPair = createECDH(CURVE_NAME)
-        let ephemeralPublicKey = Buffer.from(ephemeralKeyPair.generateKeys('base64', 'compressed'), 'base64')
-        let sharedSecret = ephemeralKeyPair.computeSecret(publicKey)
-        let info1 = Buffer.concat([sh1, ephemeralPublicKey])
-        let key = KDF_X9_63_SHA256(sharedSecret, info1, ENVELOPE_KEY_SIZE)
+        const ephemeralKeyPair = createECDH(CURVE_NAME)
+        const ephemeralPublicKey = Buffer.from(ephemeralKeyPair.generateKeys('base64', 'compressed'), 'base64')
+        const sharedSecret = ephemeralKeyPair.computeSecret(publicKey)
+        const info1 = Buffer.concat([sh1, ephemeralPublicKey])
+        const key = KDF_X9_63_SHA256(sharedSecret, info1, ENVELOPE_KEY_SIZE)
         return new EciesEnvelopeKey(key, ephemeralPublicKey)
     }
 
     static fromPrivateKey(privateKey: Buffer, ephemeralPublicKey: Buffer, sh1: Buffer): EciesEnvelopeKey {
-        let keyPair = createECDH(CURVE_NAME)
+        const keyPair = createECDH(CURVE_NAME)
         keyPair.setPrivateKey(privateKey)
-        let sharedSecret = keyPair.computeSecret(ephemeralPublicKey)
-        let info1 = Buffer.concat([sh1, ephemeralPublicKey])
-        let key = KDF_X9_63_SHA256(sharedSecret, info1, ENVELOPE_KEY_SIZE)
+        const sharedSecret = keyPair.computeSecret(ephemeralPublicKey)
+        const info1 = Buffer.concat([sh1, ephemeralPublicKey])
+        const key = KDF_X9_63_SHA256(sharedSecret, info1, ENVELOPE_KEY_SIZE)
         return new EciesEnvelopeKey(key, ephemeralPublicKey)
     }
 
@@ -83,9 +83,9 @@ export class EciesEnvelopeKey {
 // Private encrypt & decrypt
 
 function eciesEncrypt(envelopeKey: EciesEnvelopeKey, sh2: Buffer, data: Buffer, iv: Buffer, outCryptogram: EciesCryptogram) {
-    let encrypted = AES128_CBC_PKCS7_Encrypt(envelopeKey.encKey, iv, data)
-    let dataForMac = Buffer.concat([encrypted, sh2])
-    let mac = HMAC_SHA256(envelopeKey.macKey, dataForMac)
+    const encrypted = AES128_CBC_PKCS7_Encrypt(envelopeKey.encKey, iv, data)
+    const dataForMac = Buffer.concat([encrypted, sh2])
+    const mac = HMAC_SHA256(envelopeKey.macKey, dataForMac)
     outCryptogram.body = encrypted.toString('base64')
     outCryptogram.mac = mac.toString('base64')
 }
@@ -97,11 +97,11 @@ function eciesDecrypt(envelopeKey: EciesEnvelopeKey, sh2: Buffer, cryptogram: Ec
     if (cryptogram.mac == undefined) {
         throw new Error("Cryptogram doesn't contain mac")
     }
-    let body = Buffer.from(cryptogram.body, 'base64')
-    let expectedMac = Buffer.from(cryptogram.mac, 'base64')
+    const body = Buffer.from(cryptogram.body, 'base64')
+    const expectedMac = Buffer.from(cryptogram.mac, 'base64')
 
-    let dataForMac = Buffer.concat([body, sh2])
-    let mac = HMAC_SHA256(envelopeKey.macKey, dataForMac)
+    const dataForMac = Buffer.concat([body, sh2])
+    const mac = HMAC_SHA256(envelopeKey.macKey, dataForMac)
     if (!timingSafeEqual(mac, expectedMac)) {
         throw new Error('ECIES decrypt failed due to wrong MAC')
     }

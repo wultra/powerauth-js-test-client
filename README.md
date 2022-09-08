@@ -22,7 +22,7 @@ The basic configuration is easy:
 import { Config, PowerAuthTestServer } from 'powerauth-js-test-client'
 
 async function prepareTestServer(): Promise<PowerAuthTestServer> {
-    let server = new PowerAuthTestServer({ connection: { baseUrl: "http://localhost:8080/powerauth-java-server"}})
+    const server = new PowerAuthTestServer({ connection: { baseUrl: "http://localhost:8080/powerauth-java-server"}})
     await server.connect()
     return server
 }
@@ -49,29 +49,29 @@ const PA_ENROLLMENT = "http://localhost:8080/enrollment-server"
  * Function create instnace of activation helper typed with RN wrapper objects.
  */
 async function getActivationHelper(): Promise<RNActivationHelper> {
-    let cfg = { connection: { baseUrl: PA_SERVER_URL}}
-    let helper = await ActivationHelper.createWithConfig<PowerAuth>(cfg)
+    const cfg = { connection: { baseUrl: PA_SERVER_URL}}
+    const helper = await ActivationHelper.createWithConfig<PowerAuth>(cfg)
     helper.createSdk = async (appSetup, prepareData) => {
         // Prepare instanceId. We're using custom data in prepare interface to keep instance id.
-        let instanceId = prepareData?.customData?.get('instanceId') ?? 'your-app-instance-id'
-        let sdk = new PowerAuth(instanceId)
+        const instanceId = prepareData?.customData?.get('instanceId') ?? 'your-app-instance-id'
+        const sdk = new PowerAuth(instanceId)
         if (sdk.isConfigured()) {
             await sdk.deconfigure() // depending on whether you expect config changes
         }
-        let unsecure = PA_ENROLLMENT.startsWith('http://')
+        const unsecure = PA_ENROLLMENT.startsWith('http://')
         await sdk.configure(appSetup.appKey, appSetup.appSecret, appSetup.masterServerPublicKey, PA_ENROLLMENT, unsecure)
         return sdk
     }
     helper.prepareStep = async (helper, activation, prepareData) => {
         if (prepareData == undefined) throw new Error('Missing prepare data object')
         if (prepareData.password == undefined) throw new Error('Missing password in prepare data object')
-        let sdk = helper.getPowerAuthSdk()
-        let deviceName = 'Test device'
-        let activationData = PowerAuthActivation.createWithActivationCode(activation.activationCode!, deviceName)
+        const sdk = helper.getPowerAuthSdk()
+        const deviceName = 'Test device'
+        const activationData = PowerAuthActivation.createWithActivationCode(activation.activationCode!, deviceName)
         // Create activation
-        let result = await sdk.createActivation(activationData)
+        const result = await sdk.createActivation(activationData)
         // Commit activation locally
-        let auth = new PowerAuthAuthentication()
+        const auth = new PowerAuthAuthentication()
         auth.usePossession = true
         auth.userPassword = prepareData.password
         auth.useBiometry = prepareData.useBiometry ?? false
@@ -88,8 +88,8 @@ async function getActivationHelper(): Promise<RNActivationHelper> {
  * Function prepare activation to active state.
  */
 async function prepareActivationWithHelper(prepareData: ActivationHelperPrepareData): Promise<RNActivationHelper> {
-    let config = { connection: { baseUrl: PA_SERVER_URL }}
-    let helper = await createActivationHelper(config, prepareData)
+    const config = { connection: { baseUrl: PA_SERVER_URL }}
+    const helper = await createActivationHelper(config, prepareData)
     await helper.createActivation(helper.userId, prepareData)
     return helper
 }
@@ -100,7 +100,7 @@ Once the activation helper is created, then you can use it in tests. For example
 ```typescript
 describe('Manage PowerAuth applications', () => {
 
-    var activationHelper: RNActivationHelper
+    let activationHelper: RNActivationHelper
 
     beforeEach(async () => {
         activationHelper = await prepareActivationWithHelper({ password: "1234" })
@@ -112,7 +112,7 @@ describe('Manage PowerAuth applications', () => {
 
     test('Test activation block and unblock', async () => {
         await activationHelper.blockActivation('TEST-REASON')
-        let status = await activationHelper.getActivationStatus()
+        const status = await activationHelper.getActivationStatus()
         expect(status).toBe(ActivationStatus.BLOCKED)
     })
 })

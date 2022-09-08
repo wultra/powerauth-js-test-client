@@ -79,15 +79,15 @@ export class MiniMobileClient {
             throw new Error('Activation is pending or active')
         }
         // Create new device key-pair
-        let deviceKeyPair = EcKeyPair.create()
-        let encryptor = this.encryptorForApplicationScope('/pa/activation')
+        const deviceKeyPair = EcKeyPair.create()
+        const encryptor = this.encryptorForApplicationScope('/pa/activation')
         this.pedningActivationData = {
             deviceKeyPair: deviceKeyPair,
             encryptor: encryptor
         }
         // Encrypt request
         
-        let payload = { ...activationData, devicePublicKey: deviceKeyPair.formattedPublicKey() }
+        const payload = { ...activationData, devicePublicKey: deviceKeyPair.formattedPublicKey() }
         return encryptor.encryptRequestObject(payload)
     }
 
@@ -95,19 +95,19 @@ export class MiniMobileClient {
         if (!this.hasPendingActivation()) {
             throw new Error('Missing pending activation')
         }
-        let pending = this.pedningActivationData!
-        let encryptor = pending.encryptor
-        let responseData = encryptor.decryptResponseOject({
+        const pending = this.pedningActivationData!
+        const encryptor = pending.encryptor
+        const responseData = encryptor.decryptResponseOject({
             body: activationResponse.encryptedData,
             mac: activationResponse.mac
         }) as CreateActivationResponse
         if (responseData.activationId != activationResponse.activationId) {
             throw new Error("Encrypted activationId doesn't match received")
         }
-        let serverPublicKey = Buffer.from(responseData.serverPublicKey, 'base64')
-        let keyAgreement = new EcKeyAgreement(pending.deviceKeyPair)
-        let masterSecret = keyAgreement.computeSharedSecret(serverPublicKey)
-        let reducedSecret = reduceSharedSecret(masterSecret)
+        const serverPublicKey = Buffer.from(responseData.serverPublicKey, 'base64')
+        const keyAgreement = new EcKeyAgreement(pending.deviceKeyPair)
+        const masterSecret = keyAgreement.computeSharedSecret(serverPublicKey)
+        const reducedSecret = reduceSharedSecret(masterSecret)
         this.activationData = {
             devicePrivateKey: pending.deviceKeyPair.privateKey(),
             devicePublicKey: pending.deviceKeyPair.publicKey(),
@@ -125,9 +125,9 @@ export class MiniMobileClient {
 
 
     encryptorForApplicationScope(sh1: string): EciesEncryptor {
-        let sharedInfo1 = Buffer.from(sh1)
-        let sharedInfo2 = SHA256(Buffer.from(this.setup.appSecret))
-        let pubKey = Buffer.from(this.setup.masterServerPublicKey, 'base64')
+        const sharedInfo1 = Buffer.from(sh1)
+        const sharedInfo2 = SHA256(Buffer.from(this.setup.appSecret))
+        const pubKey = Buffer.from(this.setup.masterServerPublicKey, 'base64')
         return new EciesEncryptor(pubKey, sharedInfo1, sharedInfo2)
     }
 
@@ -135,9 +135,9 @@ export class MiniMobileClient {
         if (!this.hasActivation()) {
             throw new Error('Missing activation')
         }
-        let sharedInfo1 = Buffer.from(sh1)
-        let sharedInfo2 = HMAC_SHA256(this.activationData!.keys.transportKey, Buffer.from(this.setup.appSecret))
-        let pubKey = this.activationData!.serverPublicKey
+        const sharedInfo1 = Buffer.from(sh1)
+        const sharedInfo2 = HMAC_SHA256(this.activationData!.keys.transportKey, Buffer.from(this.setup.appSecret))
+        const pubKey = this.activationData!.serverPublicKey
         return new EciesEncryptor(pubKey, sharedInfo1, sharedInfo2)
     }
 }

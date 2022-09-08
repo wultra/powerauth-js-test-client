@@ -26,26 +26,26 @@ export type TypedActivationHelper = ActivationHelper<MiniMobileClient, boolean>
  */
 export async function createActivationHelper(config: Config | undefined = undefined, prepareData: ActivationHelperPrepareData | undefined = undefined): Promise<TypedActivationHelper> {
     // Acquire config
-    let cfg = config ?? await testServerConfiguration()
-    let activationData = prepareData?.customData?.get('activationPayload') as CreateActivationData
-    let activationPayload = activationData ?? {
+    const cfg = config ?? await testServerConfiguration()
+    const activationData = prepareData?.customData?.get('activationPayload') as CreateActivationData
+    const activationPayload = activationData ?? {
         activationName: 'activation-test',
         platform: 'nodejs',
         deviceInfo: 'nodejs-tests',
         extras: 'some-extras'
     }
     // Create activation helper with using MiniMobileClient as SDK implementation
-    let helper = await ActivationHelper.createWithConfig<MiniMobileClient,boolean>(cfg)
+    const helper = await ActivationHelper.createWithConfig<MiniMobileClient,boolean>(cfg)
     helper.createSdk = async (appSetup, _) => {
         return new MiniMobileClient(appSetup)
     }
     helper.prepareStep = async (helper, activation, prepareData) => {
-        let sdk = await helper.getPowerAuthSdk()
+        const sdk = await helper.getPowerAuthSdk()
         // Encrypt inner activation data with fake mobile client
-        let otp = prepareData?.otpValidation == ActivationOtpValidation.ON_KEY_EXCHANGE ? prepareData.otp : undefined
-        let encryptedPayload = sdk.createActivation({...activationPayload, activationOtp: otp})
+        const otp = prepareData?.otpValidation == ActivationOtpValidation.ON_KEY_EXCHANGE ? prepareData.otp : undefined
+        const encryptedPayload = sdk.createActivation({...activationPayload, activationOtp: otp})
         // Prepare activation on the server
-        let response = await helper.server.activationPrepare({
+        const response = await helper.server.activationPrepare({
             activationCode: activation.activationCode!,
             applicationKey: helper.appSetup.appKey,
             ephemeralPublicKey: encryptedPayload.key!,
@@ -64,7 +64,7 @@ export async function createActivationHelper(config: Config | undefined = undefi
  * Create fully prepared activation in ACTIVE state.
  */
 export async function createActivationWithActivationHelper(config: Config | undefined = undefined, prepareData: ActivationHelperPrepareData | undefined = undefined): Promise<TypedActivationHelper> {
-    let helper = await createActivationHelper(config, prepareData)
+    const helper = await createActivationHelper(config, prepareData)
     await helper.createActivation(helper.userId, prepareData)
     return helper
 }

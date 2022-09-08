@@ -20,22 +20,22 @@ import { CreateActivationData, MiniMobileClient } from "./crypto/MiniMobileClien
 import { createActivationHelper } from "./config/helpers";
 
 
-let activationPayload: CreateActivationData = {
+const activationPayload: CreateActivationData = {
     activationName: 'activation-test',
     platform: 'nodejs',
     deviceInfo: 'nodejs-tests',
     extras: 'some-extras'
 }
-let preapreData: ActivationHelperPrepareData = {
+const preapreData: ActivationHelperPrepareData = {
     customData: new Map<string, any>()
 }
 preapreData.customData!.set('activationPayload', activationPayload)
 
 describe('Manage PowerAuth applications', () => {
 
-    var cfg: Config
-    var activationHelper: ActivationHelper<MiniMobileClient, boolean>
-    var server: PowerAuthTestServer
+    let cfg: Config
+    let activationHelper: ActivationHelper<MiniMobileClient, boolean>
+    let server: PowerAuthTestServer
 
     beforeAll(async () => {
         cfg = await testServerConfiguration()
@@ -51,8 +51,8 @@ describe('Manage PowerAuth applications', () => {
     })
 
     test('Test create activation with activation code ', async () => {
-        let activation = await activationHelper.initActivation()
-        var status = await activationHelper.getActivationStatus()
+        const activation = await activationHelper.initActivation()
+        let status = await activationHelper.getActivationStatus()
         Logger.info(`Status = ${status}`)
         expect(activation.activationCode).toBeDefined()
         expect(status).toBe(ActivationStatus.CREATED)
@@ -67,26 +67,26 @@ describe('Manage PowerAuth applications', () => {
     })
 
     test('Test automatic activation create ', async () => {
-        let activation = await activationHelper.createActivation()
-        var status = await activationHelper.getActivationStatus()
+        const activation = await activationHelper.createActivation()
+        let status = await activationHelper.getActivationStatus()
         expect(status).toBe(ActivationStatus.ACTIVE)
     })
 
     test('Test activation block and unblock', async () => {
         await activationHelper.createActivation()
         await activationHelper.blockActivation('TEST-REASON')
-        let detail = await activationHelper.getActivationDetail()
+        const detail = await activationHelper.getActivationDetail()
         expect(detail.activationStatus).toBe(ActivationStatus.BLOCKED)
         expect(detail.blockedReason).toEqual('TEST-REASON')
         await activationHelper.unblockActivation()
-        let status = await activationHelper.getActivationStatus()
+        const status = await activationHelper.getActivationStatus()
         expect(status).toBe(ActivationStatus.ACTIVE)
     })
 
     test('Test activation remove', async () => {
         await activationHelper.createActivation()
         await activationHelper.removeActivation()
-        let detail = await activationHelper.getActivationDetail()
+        const detail = await activationHelper.getActivationDetail()
         expect(detail.activationStatus).toBe(ActivationStatus.REMOVED)
     })
 })

@@ -68,41 +68,41 @@ describe('MiniCrypto functions tests', () => {
 
     test('AES Encrypt & Decrypt', () => {
         AesTestData.testVectors.forEach(td => {
-            let plain = Buffer.from(td.plain, 'hex')
-            let key = Buffer.from(td.key, 'hex')
-            let iv = Buffer.from(td.iv, 'hex')
-            let enc = Buffer.from(td.enc, 'hex')
+            const plain = Buffer.from(td.plain, 'hex')
+            const key = Buffer.from(td.key, 'hex')
+            const iv = Buffer.from(td.iv, 'hex')
+            const enc = Buffer.from(td.enc, 'hex')
 
-            let encrypted = AES128_CBC_PKCS7_Encrypt(key, iv, plain)
-            let encryptedHex = encrypted.toString('hex')
+            const encrypted = AES128_CBC_PKCS7_Encrypt(key, iv, plain)
+            const encryptedHex = encrypted.toString('hex')
             expect(encryptedHex).toEqual(td.enc)
 
-            let decrypted = AES128_CBC_PKCS7_Decrypt(key, iv, enc)
-            let decryptedHex = decrypted.toString('hex')
+            const decrypted = AES128_CBC_PKCS7_Decrypt(key, iv, enc)
+            const decryptedHex = decrypted.toString('hex')
             expect(decryptedHex).toEqual(td.plain)
         })
     })
 
     test('Test HMAC-SHA256', () => {
         HmacTestData.testVectors.forEach(td => {
-            let key = Buffer.from(td.key, 'hex')
-            let data = Buffer.from(td.data, 'hex')
-            let hmac = Buffer.from(td.hmac, 'hex')
+            const key = Buffer.from(td.key, 'hex')
+            const data = Buffer.from(td.data, 'hex')
+            const hmac = Buffer.from(td.hmac, 'hex')
 
-            let mac = HMAC_SHA256(key, data, hmac.length)
-            let macHex = mac.toString('hex')
+            const mac = HMAC_SHA256(key, data, hmac.length)
+            const macHex = mac.toString('hex')
             expect(macHex).toEqual(td.hmac)
         })
     })
     
     test('Test X9.63 KDF', () => {
         KdfTestData.testVectors.forEach(td => {
-            let secret = Buffer.from(td.secret, 'hex')
-            let sinfo = Buffer.from(td.sinfo, 'hex')
-            let expected = Buffer.from(td.expected, 'hex')
+            const secret = Buffer.from(td.secret, 'hex')
+            const sinfo = Buffer.from(td.sinfo, 'hex')
+            const expected = Buffer.from(td.expected, 'hex')
 
-            let derived = KDF_X9_63_SHA256(secret, sinfo, expected.length)
-            let derivedHex = derived.toString('hex')
+            const derived = KDF_X9_63_SHA256(secret, sinfo, expected.length)
+            const derivedHex = derived.toString('hex')
             expect(derivedHex).toEqual(td.expected)
         })
     })

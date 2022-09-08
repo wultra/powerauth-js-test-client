@@ -116,7 +116,7 @@ export class PowerAuthTestServer {
      * @returns Promise with optional `Application` object in a result.
      */
     async findApplicationByName(applicationName: string): Promise<Application | undefined> {
-        let appList = await this.getApplicationList()
+        const appList = await this.getApplicationList()
         return appList.find(app => app.applicationName == applicationName)
     }
 
@@ -177,7 +177,7 @@ export class PowerAuthTestServer {
             Logger.warning(`Application version is already ${supported ? "supported" : "not-supported"}`)
             return
         }
-        let result = await this.api.setAppplicationVersionSupported(applicationVersion, supported)
+        const result = await this.api.setAppplicationVersionSupported(applicationVersion, supported)
         if (result != supported) {
             throw new PowerAuthServerError(`Failed to set application version ${supported ? "supported" : "not-supported"}. The status after request is different than expected.`)
         }
@@ -191,27 +191,27 @@ export class PowerAuthTestServer {
      * @returns Promise with `ApplicationWithVersion` in a result.
      */
     async prepareApplicationFromConfiguration(applicationConfig: ApplicationConfig | undefined = undefined): Promise<ApplicationSetup> {
-        let appConfig = applicationConfig ?? this.config.application
-        let applicationName = appConfig?.applicationName ?? DEFAULT_APPLICATION_NAME
-        let applicationVersionName = appConfig?.applicationVersion ?? DEFAULT_APPLICATION_VERSION_NAME
+        const appConfig = applicationConfig ?? this.config.application
+        const applicationName = appConfig?.applicationName ?? DEFAULT_APPLICATION_NAME
+        const applicationVersionName = appConfig?.applicationVersion ?? DEFAULT_APPLICATION_VERSION_NAME
 
         Logger.info(`Preparing application '${applicationName}' with version '${applicationVersionName}'`)
 
-        var application = await this.findApplicationByName(applicationName)
+        let application = await this.findApplicationByName(applicationName)
         if (application == null) {
             application = await this.api.createApplication(applicationName)
         }
-        let applicationDetail = await this.getApplicationDetail(application)
-        var version = this.findApplicationVersionByName(applicationDetail, applicationVersionName)
+        const applicationDetail = await this.getApplicationDetail(application)
+        let version = this.findApplicationVersionByName(applicationDetail, applicationVersionName)
         if (version == null) {
             version = await this.api.createApplicationVersion(application, applicationVersionName)
         }
         if (!version.supported) {
             await this.setAppplicationVersionSupported(version, true)
         }
-        let appSetup = new ApplicationSetup(applicationDetail, version)
+        const appSetup = new ApplicationSetup(applicationDetail, version)
         if (appConfig?.enableRecoveryCodes) {
-            let recoveryCodesConfig = await this.getRecoveryConfig(appSetup.application)
+            const recoveryCodesConfig = await this.getRecoveryConfig(appSetup.application)
             if (!recoveryCodesConfig.activationRecoveryEnabled) {
                 recoveryCodesConfig.activationRecoveryEnabled = true
                 await this.updateRecoveryConfig(recoveryCodesConfig)

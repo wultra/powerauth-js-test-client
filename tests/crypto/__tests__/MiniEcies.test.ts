@@ -19,37 +19,37 @@ import { EciesDecryptor, EciesEncryptor } from "../MiniEcies"
 
 describe('Validate ECIES functionality', () => {
     test('ECIES encrypt and decrypt', () => {
-        let sh1 = Buffer.from('/shared/secret1')
-        let sh2 = Buffer.from('/shared/secret2')
+        const sh1 = Buffer.from('/shared/secret1')
+        const sh2 = Buffer.from('/shared/secret2')
 
-        let server = EcKeyPair.create()
-        let clientEncryptor = new EciesEncryptor(server.publicKey(), sh1, sh2)
-        let serverDecryptor = new EciesDecryptor(server.privateKey(), sh1, sh2)
+        const server = EcKeyPair.create()
+        const clientEncryptor = new EciesEncryptor(server.publicKey(), sh1, sh2)
+        const serverDecryptor = new EciesDecryptor(server.privateKey(), sh1, sh2)
 
-        let requestData = {
+        const requestData = {
             hello: "world!",
             password: "nbusr123"
         }
 
-        let responseData = {
+        const responseData = {
             something: "isWrong",
             username: "unknown"
         }
 
         // [ 1 ] Client: Generate encrypted request
-        let encryptedRequest = clientEncryptor.encryptRequestObject(requestData)
+        const encryptedRequest = clientEncryptor.encryptRequestObject(requestData)
         expect(encryptedRequest).toBeDefined()
 
         // [ 2 ] Server: Decrypt request data
-        let decrypedRequest = serverDecryptor.decryptRequestObject(encryptedRequest)
+        const decrypedRequest = serverDecryptor.decryptRequestObject(encryptedRequest)
         expect(decrypedRequest).toEqual(requestData)
 
         // [ 3 ] Server: Encrypt response
-        let encryptedResponse = serverDecryptor.encryptResponseObject(responseData)
+        const encryptedResponse = serverDecryptor.encryptResponseObject(responseData)
         expect(encryptedResponse).toBeDefined()
 
         // [ 4 ] Client: Decrypt response
-        let decryptedRespnse = clientEncryptor.decryptResponseOject(encryptedResponse)
+        const decryptedRespnse = clientEncryptor.decryptResponseOject(encryptedResponse)
         expect(decryptedRespnse).toEqual(responseData)
     })
 })

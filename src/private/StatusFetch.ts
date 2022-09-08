@@ -26,7 +26,7 @@ import { Endpoints } from "./v10/Endpoints"
  * @returns Promise with SystemStatus.
  */
 export async function getSystemStatus(client: HttpClient, failIfNoOK: boolean): Promise<SystemStatus> {
-    let status = await client.postEmpty<SystemStatus>(Endpoints.getSystemStatus)
+    const status = await client.postEmpty<SystemStatus>(Endpoints.getSystemStatus)
     if (status.status != 'OK' && failIfNoOK) {
         throw new PowerAuthServerError(`System status is not OK. Status = '${status.status}'`)
     }

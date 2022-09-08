@@ -19,9 +19,9 @@ import { ApplicationSetup, Config, Logger, PowerAuthTestServer } from "../src/in
 
 describe('Manage PowerAuth applications', () => {
 
-    var cfg: Config
-    var server: PowerAuthTestServer
-    var app: ApplicationSetup
+    let cfg: Config
+    let server: PowerAuthTestServer
+    let app: ApplicationSetup
 
     beforeAll(async () => {
         cfg = await testServerConfiguration()
@@ -31,23 +31,23 @@ describe('Manage PowerAuth applications', () => {
     })
 
     test('Get recovery config', async () => {
-        let config = await server.getRecoveryConfig(app.application)
+        const config = await server.getRecoveryConfig(app.application)
         expect(config.applicationId).toEqual(app.application.applicationId)
     })
 
     test('Alter recovery config', async () => {
-        let config = await server.getRecoveryConfig(app.application)
+        const config = await server.getRecoveryConfig(app.application)
         expect(config.applicationId).toEqual(app.application.applicationId)
         // Keep original value
-        let rcEnabled = config.activationRecoveryEnabled
+        const rcEnabled = config.activationRecoveryEnabled
 
         // Update config to opposite value
         config.activationRecoveryEnabled = !rcEnabled
-        var updated = await server.updateRecoveryConfig(config)
+        let updated = await server.updateRecoveryConfig(config)
         expect(updated).toBe(true)
 
         // Validate change with get
-        var rcAfterUpdate = await server.getRecoveryConfig(app.application)
+        let rcAfterUpdate = await server.getRecoveryConfig(app.application)
         expect(rcAfterUpdate.activationRecoveryEnabled).toEqual(!rcEnabled)
 
         // Set back to original value

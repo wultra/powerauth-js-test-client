@@ -44,11 +44,11 @@ export const DEFAULT_CONFIG_TO_LOCALHOST: Config = {
 
 export async function testServerConfiguration(): Promise<Config> {
     try {
-        // let config file
-        let configFile = 'test-config.json'
-        let configPath = path.resolve(__dirname, `./${configFile}`)
-        let configData = await fs.readFile(configPath, 'utf-8')
-        let config = JSON.parse(configData) as Config
+        // test config file
+        const configFile = 'test-config.json'
+        const configPath = path.resolve(__dirname, `./${configFile}`)
+        const configData = await fs.readFile(configPath, 'utf-8')
+        const config = JSON.parse(configData) as Config
         if (config.connection != undefined && config.connection.baseUrl != undefined) {
             return config
         }

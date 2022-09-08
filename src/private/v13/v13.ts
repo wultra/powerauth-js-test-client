@@ -100,7 +100,7 @@ class ClientImpl implements ServerAPI {
     }
 
     validateServerVersion(serverVersion: string): ServerVersion {
-        let version = ServerVersion.fromString(serverVersion)
+        const version = ServerVersion.fromString(serverVersion)
         if (version.numericVersion < this.minSupportedVersion.numericVersion || version.numericVersion > this.maxSupportedVersion.numericVersion) {
             throw new PowerAuthServerError(`Unsupported server version in V1_3 client. Version = ${serverVersion}`)
         }
@@ -111,7 +111,7 @@ class ClientImpl implements ServerAPI {
         if (this.currentServerVersion != undefined) {
             return this.currentServerVersion
         }
-        let status = await this.getSystemStatus(true)
+        const status = await this.getSystemStatus(true)
         this.currentServerVersion = this.validateServerVersion(status.version)
         return this.currentServerVersion
     }
@@ -119,19 +119,19 @@ class ClientImpl implements ServerAPI {
     // Applications
     
     async getApplicationList(): Promise<Application[]> {
-        let list = (await this.client.postEmpty<ApplicationList_Response>(Endpoints.applicationList)).applications ?? []
+        const list = (await this.client.postEmpty<ApplicationList_Response>(Endpoints.applicationList)).applications ?? []
         return list.map(app => Application.fromV13Data(app.applicationId, app.applicationRoles))
     }
 
     async createApplication(applicationName: string): Promise<Application> {
-        let request = { applicationId: applicationName }
-        let app = await this.client.post<ApplicationCreate_Request, ApplicationCreate_Response>(Endpoints.applicationCreate, request)
+        const request = { applicationId: applicationName }
+        const app = await this.client.post<ApplicationCreate_Request, ApplicationCreate_Response>(Endpoints.applicationCreate, request)
         return Application.fromV13Data(app.applicationId, app.applicationRoles)
     }
 
     async getApplicationDetail(application: Application): Promise<ApplicationDetail> {
-        let request = { applicationId: application.applicationId.identifier }
-        let detail = await this.client.post<ApplicationDetail_Request, ApplicationDetail_Response>(Endpoints.applicationDetail, request)
+        const request = { applicationId: application.applicationId.identifier }
+        const detail = await this.client.post<ApplicationDetail_Request, ApplicationDetail_Response>(Endpoints.applicationDetail, request)
         return {
             applicationId: ObjectId.fromV13Data(detail.applicationId),
             masterPublicKey: detail.masterPublicKey,
@@ -149,11 +149,11 @@ class ClientImpl implements ServerAPI {
     }
 
     async createApplicationVersion(application: Application, versionName: string): Promise<ApplicationVersion> {
-        let request = { 
+        const request = { 
             applicationId: application.applicationId.identifier,
             applicationVersionId: versionName
         }
-        let response = await this.client.post<ApplicationVersionCreate_Request, ApplicationVersionCreate_Response>(Endpoints.applicationVersionCreate, request)
+        const response = await this.client.post<ApplicationVersionCreate_Request, ApplicationVersionCreate_Response>(Endpoints.applicationVersionCreate, request)
         return {
             applicationId: application.applicationId,
             applicationVersionId: ObjectId.fromV13Data(response.applicationVersionId),
@@ -164,19 +164,19 @@ class ClientImpl implements ServerAPI {
     }
 
     async setAppplicationVersionSupported(applicationVersion: ApplicationVersion, supported: boolean): Promise<boolean> {
-        let request = {
+        const request = {
              applicationId: applicationVersion.applicationId.identifier,
              applicationVersionId: applicationVersion.applicationVersionId.identifier 
         }
-        let response = await this.client.post<ApplicationVersionSupport_Request, ApplicationVersionSupport_Response>(Endpoints.applicationVersionSupport(supported), request)
+        const response = await this.client.post<ApplicationVersionSupport_Request, ApplicationVersionSupport_Response>(Endpoints.applicationVersionSupport(supported), request)
         return response.supported
     }
 
     // Recovery
 
     async getRecoveryConfig(application: Application): Promise<RecoveryConfig> {
-        let request = { applicationId: application.applicationId.identifier }
-        let response = await this.client.post<GetRecoveryConfig_Request, GetRecoveryConfig_Response>(Endpoints.recoveryConfigDetail, request)
+        const request = { applicationId: application.applicationId.identifier }
+        const response = await this.client.post<GetRecoveryConfig_Request, GetRecoveryConfig_Response>(Endpoints.recoveryConfigDetail, request)
         return {
             applicationId: ObjectId.fromV13Data(response.applicationId),
             activationRecoveryEnabled: response.activationRecoveryEnabled,
@@ -188,28 +188,28 @@ class ClientImpl implements ServerAPI {
     }
 
     async updateRecoveryConfig(recoveryConfig: RecoveryConfig): Promise<boolean> {
-        let request = {
+        const request = {
             applicationId: recoveryConfig.applicationId.identifier,
             activationRecoveryEnabled: recoveryConfig.activationRecoveryEnabled,
             recoveryPostcardEnabled: recoveryConfig.recoveryPostcardEnabled,
             allowMultipleRecoveryCodes: recoveryConfig.allowMultipleRecoveryCodes,
             remotePostcardPublicKey: recoveryConfig.remotePostcardPublicKey
         }
-        let response = await this.client.post<UpdateRecoveryConfig_Request, UpdateRecoveryConfig_Response>(Endpoints.recoveryConfigUpdate, request)
+        const response = await this.client.post<UpdateRecoveryConfig_Request, UpdateRecoveryConfig_Response>(Endpoints.recoveryConfigUpdate, request)
         return response.updated
     }
 
     // Activation
 
     async activationInit(application: Application, userId: string, otp: string | undefined, otpValidation: ActivationOtpValidation | undefined, maxFailureCount: number | undefined): Promise<Activation> {
-        let request = {
+        const request = {
             applicationId: application.applicationId.identifier,
             userId: userId,
             activationOtp: otp,
             activationOtpValidation: otpValidation,
             maxFailureCount: maxFailureCount
         }
-        let response = await this.client.post<ActivationInit_Request, ActivationInit_Response>(Endpoints.activationInit, request)
+        const response = await this.client.post<ActivationInit_Request, ActivationInit_Response>(Endpoints.activationInit, request)
         return {
             userId: response.userId,
             applicationId: application.applicationId,
@@ -220,56 +220,56 @@ class ClientImpl implements ServerAPI {
     }
 
     async activationUpdateOtp(activation: Activation, otp: string, externalUserId: string | undefined): Promise<boolean> {
-        let request = {
+        const request = {
             activationId: activation.activationId,
             activationOtp: otp,
             externalUserId: externalUserId
         }
-        let response = await this.client.post<ActivationOtpUpdate_Request, ActivationOtpUpdate_Response>(Endpoints.activationUpdateOtp, request)
+        const response = await this.client.post<ActivationOtpUpdate_Request, ActivationOtpUpdate_Response>(Endpoints.activationUpdateOtp, request)
         return response.updated        
     }
 
     async activationCommit(activation: Activation, otp: string | undefined, externalUserId: string | undefined): Promise<boolean> {
-        let request = {
+        const request = {
             activationId: activation.activationId,
             activationOtp: otp,
             externalUserId: externalUserId
         }
-        let response = await this.client.post<ActivationCommit_Request, ActivationCommit_Response>(Endpoints.activationCommit, request)
+        const response = await this.client.post<ActivationCommit_Request, ActivationCommit_Response>(Endpoints.activationCommit, request)
         return response.activated
     }
 
     async activationBlock(activation: Activation, reason: string | undefined, externalUserId: string | undefined): Promise<ActivationStatus> {
-        let request = {
+        const request = {
             activationId: activation.activationId,
             reason: reason,
             externalUserId: externalUserId
         }
-        let response = await this.client.post<ActivationBlock_Request, ActivationBlock_Response>(Endpoints.activationBlock, request)
+        const response = await this.client.post<ActivationBlock_Request, ActivationBlock_Response>(Endpoints.activationBlock, request)
         return response.activationStatus
     }
 
     async activationUnblock(activation: Activation, externalUserId: string | undefined): Promise<ActivationStatus> {
-        let request = {
+        const request = {
             activationId: activation.activationId,
             externalUserId: externalUserId
         }
-        let response = await this.client.post<ActivationUnblock_Request, ActivationUnblock_Response>(Endpoints.activationUnblock, request)
+        const response = await this.client.post<ActivationUnblock_Request, ActivationUnblock_Response>(Endpoints.activationUnblock, request)
         return response.activationStatus
     }
 
     async activationRemove(activation: Activation, revokeRecoveryCodes: boolean, externalUserId: string | undefined): Promise<boolean> {
-        let request = {
+        const request = {
             activationId: activation.activationId,
             revokeRecoveryCodes: revokeRecoveryCodes,
             externalUserId: externalUserId
         }
-        let response = await this.client.post<ActivationRemove_Request, ActivationRemove_Response>(Endpoints.activationRemove, request)
+        const response = await this.client.post<ActivationRemove_Request, ActivationRemove_Response>(Endpoints.activationRemove, request)
         return response.removed
     }
 
     async getActivationDetail(activation: Activation, challenge: string | undefined): Promise<ActivationDetail> {
-        let request = {
+        const request = {
             activationId: activation.activationId,
             challenge: challenge
         }
@@ -277,7 +277,7 @@ class ClientImpl implements ServerAPI {
     }
 
     async activationPrepare(data: ActivationPrepareData): Promise<ActivationPrepareResult> {
-        let response = await this.client.post<ActivationPrepare_Request, ActivationPrepare_Response>(Endpoints.activationPrepare, data)
+        const response = await this.client.post<ActivationPrepare_Request, ActivationPrepare_Response>(Endpoints.activationPrepare, data)
         return {
             activationId: response.activationId,
             userId: response.userId,

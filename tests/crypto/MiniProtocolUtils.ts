@@ -38,15 +38,15 @@ export function reduceSharedSecret(secret: Buffer): Buffer {
     if (secret.length != 32) {
         throw new Error('Secret for reduce must be 32 bytes long')
     }
-    let reducedSize = secret.length / 2
-    let result = Buffer.allocUnsafe(reducedSize)
-    for (var i = 0; i < reducedSize; i++) {
+    const reducedSize = secret.length / 2
+    const result = Buffer.allocUnsafe(reducedSize)
+    for (let i = 0; i < reducedSize; i++) {
         result[i] = secret[i] ^ secret[i + reducedSize]
     }
     return result
 }
 
 export function deriveSecretKeyFromIndex(masterSecret: Buffer, index: Buffer) {
-    let derived = HMAC_SHA256(masterSecret, index)
+    const derived = HMAC_SHA256(masterSecret, index)
     return reduceSharedSecret(derived)
 }

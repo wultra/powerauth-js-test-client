@@ -112,8 +112,8 @@ export class ServerVersion {
         if (version == undefined) {
             throw Error("Server version is not provided")
         }
-        let ver = version.endsWith("-SNAPSHOT") ? version.substring(0, version.length - 9) : version
-        let found = allowPrefixMatch
+        const ver = version.endsWith("-SNAPSHOT") ? version.substring(0, version.length - 9) : version
+        const found = allowPrefixMatch
             ? this.allValues.find(e => ver.startsWith(e.version))
             : this.allValues.find(e => e.version == ver)
         if (!found) {

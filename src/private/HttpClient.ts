@@ -67,14 +67,14 @@ export class HttpClient {
      */
     async post<TRequest, TResponse>(endpoint: Endpoint, request: TRequest): Promise<TResponse> {
         // Prepare full URL and request data
-        let url = new URL(this.baseUrl + endpoint.path)
-        let requestObject: RequestObject<TRequest> = { requestObject: request }
-        let headers = this.defaultHeaders
+        const url = new URL(this.baseUrl + endpoint.path)
+        const requestObject: RequestObject<TRequest> = { requestObject: request }
+        const headers = this.defaultHeaders
         
         Logger.request(url, "POST", requestObject, headers)
 
         // fetch data from remote location
-        let timeout = new TimeoutHandler(this.config.connection.requestTimeout ?? DEFAULT_REQUEST_TIMEOUT)
+        const timeout = new TimeoutHandler(this.config.connection.requestTimeout ?? DEFAULT_REQUEST_TIMEOUT)
         let response: Response
         let plainResponseObject: PlainResponse
         let statusCode: number
@@ -114,14 +114,14 @@ export class HttpClient {
             return (plainResponseObject as ResponseObject<TResponse>).responseObject
         }
         // Throw an error
-        let errorResponse = plainResponseObject as ResponseObject<ErrorResponse>
+        const errorResponse = plainResponseObject as ResponseObject<ErrorResponse>
         if (errorResponse.responseObject == undefined) {
             if (statusCode == 401)
             throw new PowerAuthServerError(`No error response returned from the server. Status = ${statusCode}`, statusCode)
         }
         // Throw an error
-        let code = errorResponse.responseObject?.code ?? '<<null-code>>'
-        let message = errorResponse.responseObject?.message ?? '<<null-message>>'
+        const code = errorResponse.responseObject?.code ?? '<<null-code>>'
+        const message = errorResponse.responseObject?.message ?? '<<null-message>>'
         throw new PowerAuthServerError(`Server returned error ${code}, message '${message}'. Status = ${statusCode}`, statusCode)
     }
 
@@ -133,7 +133,7 @@ export class HttpClient {
      * @returns Normalized URL.
      */
     private buildBaseUrl(config: ConnectionConfig): string {
-        var url = config.baseUrl
+        let url = config.baseUrl
         if (url.endsWith('/')) {
             url = url.substring(0, url.length - 1)
         }
@@ -149,7 +149,7 @@ export class HttpClient {
      * @returns Headers in form of key-value record.
      */
     private buildDefaultHeaders(config: ConnectionConfig): Record<string, string> {
-        let authHeader = this.buildAuthHeader(config)
+        const authHeader = this.buildAuthHeader(config)
         if (authHeader != undefined) {
             return {
                 'Content-Type': 'application/json; charset=utf-8',
@@ -171,7 +171,7 @@ export class HttpClient {
      */
     private buildAuthHeader(config: ConnectionConfig): string | undefined {
         if (config.username != undefined && config.password != undefined) {
-            let credentials = Base64.encode(`${config.username}:${config.password}`)
+            const credentials = Base64.encode(`${config.username}:${config.password}`)
             return  `Basic ${credentials}`
         }
     }
