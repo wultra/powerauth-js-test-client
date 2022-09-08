@@ -109,11 +109,10 @@ class ClientImpl implements ServerAPI {
     }
 
     async getServerVersion(): Promise<ServerVersion> {
-        if (this.currentServerVersion != undefined) {
-            return this.currentServerVersion
+        if (!this.currentServerVersion) {
+            const status = await this.getSystemStatus(true)
+            this.currentServerVersion = this.validateServerVersion(status.version)
         }
-        const status = await this.getSystemStatus(true)
-        this.currentServerVersion = this.validateServerVersion(status.version)
         return this.currentServerVersion
     }
 

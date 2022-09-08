@@ -109,7 +109,7 @@ export class ServerVersion {
      * @returns Version object.
      */
     static fromString(version: string | undefined, allowPrefixMatch: boolean = true): ServerVersion {
-        if (version == undefined) {
+        if (!version) {
             throw Error("Server version is not provided")
         }
         const ver = version.endsWith("-SNAPSHOT") ? version.substring(0, version.length - 9) : version

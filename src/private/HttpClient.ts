@@ -103,7 +103,7 @@ export class HttpClient {
         }
         
         // At first, try to evaluate status property
-        if (plainResponseObject.status == undefined) {
+        if (!plainResponseObject.status) {
             throw new PowerAuthServerError(`Unknown response object returned from the server. Status = ${statusCode}`, statusCode)
         }
         // Cast to proper response object
@@ -115,7 +115,7 @@ export class HttpClient {
         }
         // Throw an error
         const errorResponse = plainResponseObject as ResponseObject<ErrorResponse>
-        if (errorResponse.responseObject == undefined) {
+        if (!errorResponse.responseObject) {
             if (statusCode == 401)
             throw new PowerAuthServerError(`No error response returned from the server. Status = ${statusCode}`, statusCode)
         }
@@ -150,16 +150,16 @@ export class HttpClient {
      */
     private buildDefaultHeaders(config: ConnectionConfig): Record<string, string> {
         const authHeader = this.buildAuthHeader(config)
-        if (authHeader != undefined) {
+        if (!authHeader) {
             return {
                 'Content-Type': 'application/json; charset=utf-8',
-                'Accept': 'application/json; charset=utf-8',
-                'Authorization': authHeader
+                'Accept': 'application/json; charset=utf-8'
             }
         } else {
             return {
                 'Content-Type': 'application/json; charset=utf-8',
-                'Accept': 'application/json; charset=utf-8'
+                'Accept': 'application/json; charset=utf-8',
+                'Authorization': authHeader
             }
         }
     }

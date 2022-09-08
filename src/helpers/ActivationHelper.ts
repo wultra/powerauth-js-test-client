@@ -73,7 +73,7 @@ export class ActivationHelper<SDK, PrepareResult> {
     private activationData: Activation | undefined
     private sdkInstance: SDK | undefined
     private prepareData: ActivationHelperPrepareData | undefined
-    private prepareResult: PrepareResult | undefined
+    private prepareResultData: PrepareResult | undefined
 
     prepareStep: ActivationPrepareFunc<SDK, PrepareResult> | undefined
     createSdk: CreateSdkFunc<SDK> | undefined
@@ -162,10 +162,10 @@ export class ActivationHelper<SDK, PrepareResult> {
      * Result from prepare activation step. If result is not available then throws an error.
      */
     get prepareActivationResult(): PrepareResult {
-        if (this.prepareActivationResult == undefined) {
+        if (!this.prepareResultData) {
             throw new Error('Result from prepare activation is not available')
         }
-        return this.prepareActivationResult
+        return this.prepareResultData
     }
 
     /**
@@ -174,7 +174,7 @@ export class ActivationHelper<SDK, PrepareResult> {
      * @returns Type returned from action.
      */
     withActivation<T>(action: (activation: Activation) => T): T {
-        if (this.activationData == undefined) {
+        if (!this.activationData) {
             throw new Error('Activation is not available')
         }
         return action(this.activationData)
@@ -187,8 +187,8 @@ export class ActivationHelper<SDK, PrepareResult> {
      */
     async withSDK<T>(action: (sdk: SDK) => T): Promise<T> {
         let sdk: SDK
-        if (this.sdkInstance == undefined) {
-            if (this.createSdk == undefined) {
+        if (!this.sdkInstance) {
+            if (!this.createSdk) {
                 throw new Error('SDK factory function is not set')
             }
             sdk = this.sdkInstance = await this.createSdk(this.appSetup, this.prepareData)
@@ -226,16 +226,17 @@ export class ActivationHelper<SDK, PrepareResult> {
      * @param prepareData Data for activation prepare step.
      * @returns Promise with void.
      */
-    prepareActivation(prepareData: ActivationHelperPrepareData | undefined = undefined): Promise<PrepareResult> {
+    async prepareActivation(prepareData: ActivationHelperPrepareData | undefined = undefined): Promise<PrepareResult> {
         this.prepareData = prepareData
-        return this.withActivation(activation => this.prepareActivationImpl(activation, prepareData))
+        this.prepareResultData = await this.withActivation(activation => this.prepareActivationImpl(activation, prepareData))
+        return this.prepareResultData
     }
 
     /**
      * Prepare activation implementation.
      */
     private prepareActivationImpl(activation: Activation, data: ActivationHelperPrepareData | undefined): Promise<PrepareResult> {
-        if (this.prepareStep == undefined) {
+        if (!this.prepareStep) {
             throw new Error('Missing prepare step in ActivationHelper')
         }
         return this.prepareStep(this, activation, data)

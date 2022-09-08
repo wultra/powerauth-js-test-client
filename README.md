@@ -63,8 +63,8 @@ async function getActivationHelper(): Promise<RNActivationHelper> {
         return sdk
     }
     helper.prepareStep = async (helper, activation, prepareData) => {
-        if (prepareData == undefined) throw new Error('Missing prepare data object')
-        if (prepareData.password == undefined) throw new Error('Missing password in prepare data object')
+        if (!prepareData) throw new Error('Missing prepare data object')
+        if (!prepareData.password) throw new Error('Missing password in prepare data object')
         const sdk = helper.getPowerAuthSdk()
         const deviceName = 'Test device'
         const activationData = PowerAuthActivation.createWithActivationCode(activation.activationCode!, deviceName)

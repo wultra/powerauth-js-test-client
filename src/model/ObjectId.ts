@@ -35,7 +35,7 @@ export class ObjectId {
      * then throws an error.
      */
     get identifier(): string {
-        if (this.objectId == undefined) {
+        if (!this.objectId) {
             throw new Error("API object has no string identifier set")
         }
         return this.objectId
@@ -46,7 +46,7 @@ export class ObjectId {
      * then throws an error.
      */
     get legacyIdentifier(): number {
-        if (this.legacyId == undefined) {
+        if (!this.legacyId) {
             throw new Error("API object has no legacy identifier set")
         }
         return this.legacyId
@@ -59,7 +59,7 @@ export class ObjectId {
      * @returns ObjectId created from legacy data.
      */
     static fromV10Data(legacyId: number, objectName: string | undefined = undefined): ObjectId {
-        return new ObjectId(objectName == undefined ? legacyId.toString() : objectName, undefined, legacyId)
+        return new ObjectId(!objectName ? legacyId.toString() : objectName, undefined, legacyId)
     }
 
     /**

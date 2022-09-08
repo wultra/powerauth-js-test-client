@@ -91,10 +91,10 @@ function eciesEncrypt(envelopeKey: EciesEnvelopeKey, sh2: Buffer, data: Buffer, 
 }
 
 function eciesDecrypt(envelopeKey: EciesEnvelopeKey, sh2: Buffer, cryptogram: EciesCryptogram, iv: Buffer): Buffer {
-    if (cryptogram.body == undefined) {
+    if (!cryptogram.body) {
         throw new Error("Cryptogram doesn't contain body")
     }
-    if (cryptogram.mac == undefined) {
+    if (!cryptogram.mac) {
         throw new Error("Cryptogram doesn't contain mac")
     }
     const body = Buffer.from(cryptogram.body, 'base64')
@@ -200,8 +200,8 @@ export class EciesEncryptor {
         }
         let ephemeralPublicKey = cryptogram.key
         let nonce = cryptogram.nonce
-        if (ephemeralPublicKey == undefined) { throw new Error('Missing key in cryptogram') }
-        if (nonce == undefined) { throw new Error('Missing nonce in cryptogram')}
+        if (!ephemeralPublicKey) { throw new Error('Missing key in cryptogram') }
+        if (!nonce) { throw new Error('Missing nonce in cryptogram')}
 
         this.envelopeKey = EciesEnvelopeKey.fromPrivateKey(this.privateKey!, Buffer.from(ephemeralPublicKey, 'base64'), this.sh1)
         if (DUMP_ENVELOPE_KEYS) { this.envelopeKey.dumpKeys('decryptor') }
