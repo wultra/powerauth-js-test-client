@@ -14,7 +14,7 @@
     "test": "./scripts/build.sh test",
     "test-verbose": "./scripts/build.sh test-verbose",
     "build": "./scripts/build.sh",
-    "build-test": "./scripts/build.sh compile"
+    "compile": "./scripts/build.sh compile"
   },
   "repository": {
     "type": "git",
