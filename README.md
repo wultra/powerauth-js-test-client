@@ -38,7 +38,7 @@ The `ActivationHelper` class simplifies regular tasks with activation creation. 
 
 ```typescript
 import { ActivationHelper, PowerAuthTestServer } from 'powerauth-js-test-client'
-import { PowerAuth, PowerAuthActivation } from 'react-native-powerauth-mobile-sdk'
+import { PowerAuth, PowerAuthActivation, PowerAuthAuthentication, PowerAuthCreateActivationResult } from 'react-native-powerauth-mobile-sdk'
 
 type RNActivationHelper = ActivationHelper<PowerAuth, PowerAuthCreateActivationResult>
 
@@ -106,7 +106,7 @@ describe('Manage PowerAuth applications', () => {
     })
 
     afterEach(async () => {
-        await activationHelper?.cleanup()
+        await activationHelper.cleanup()
     })
 
     test('Test activation block and unblock', async () => {
