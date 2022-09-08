@@ -89,9 +89,14 @@ export class Logger {
         this.logImpl.setBaseUrl(baseUrl)
     }
 
-    static error(message: string) {
+    static error(message: string): void
+    static error(message: any): void {
         if (this.verboseLevel >= VerboseLevel.Error) {
-            this.logImpl.error(message)
+            if (typeof message !== 'string') {
+                this.logImpl.error(`${JSON.stringify(message)}`)
+            } else {
+                this.logImpl.error(message)
+            }
         }
     }
 
@@ -113,15 +118,25 @@ export class Logger {
         }
     }
 
-    static warning(message: string) {
+    static warning(message: string): void
+    static warning(message: any): void {
         if (this.verboseLevel >= VerboseLevel.Warning) {
-            this.logImpl.warning(message)
+            if (typeof message !== 'string') {
+                this.logImpl.warning(`${JSON.stringify(message)}`)
+            } else {
+                this.logImpl.warning(message)
+            }
         }
     }
 
-    static info(message: string) {
+    static info(message: string): void
+    static info(message: any): void {
         if (this.verboseLevel == VerboseLevel.All) {
-            this.logImpl.info(message)
+            if (typeof message !== 'string') {
+                this.logImpl.info(`${JSON.stringify(message)}`)
+            } else {
+                this.logImpl.info(message)
+            }
         }
     }
 

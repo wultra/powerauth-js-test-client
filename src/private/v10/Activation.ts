@@ -122,3 +122,4 @@ export interface ActivationPrepare_Response {
     encryptedData: string
     mac: string
 }
+

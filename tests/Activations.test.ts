@@ -15,21 +15,26 @@
 //
 
 import { testServerConfiguration } from "./config/config";
-import { ActivationHelper, ActivationStatus, ApplicationSetup, Config, Logger, PowerAuthTestServer } from "../src/index";
-import { CreateActivationData, FakeMobileClient } from "./helpers/FakeMobileClient";
+import { ActivationHelper, ActivationHelperPrepareData, ActivationStatus, Config, Logger, PowerAuthTestServer } from "../src/index";
+import { CreateActivationData, MiniMobileClient } from "./crypto/MiniMobileClient";
+import { createActivationHelper } from "./config/helpers";
+
+
+let activationPayload: CreateActivationData = {
+    activationName: 'activation-test',
+    platform: 'nodejs',
+    deviceInfo: 'nodejs-tests',
+    extras: 'some-extras'
+}
+let preapreData: ActivationHelperPrepareData = {
+    customData: new Map<string, any>()
+}
+preapreData.customData!.set('activationPayload', activationPayload)
 
 describe('Manage PowerAuth applications', () => {
 
-    let activationPayload: CreateActivationData = {
-        activationName: 'activation-test',
-        platform: 'nodejs',
-        deviceInfo: 'nodejs-tests',
-        extras: 'some-extras'
-    }
-
     var cfg: Config
-    var activationHelper: ActivationHelper
-    var client: FakeMobileClient
+    var activationHelper: ActivationHelper<MiniMobileClient, boolean>
     var server: PowerAuthTestServer
 
     beforeAll(async () => {
@@ -37,28 +42,12 @@ describe('Manage PowerAuth applications', () => {
     })
 
     beforeEach(async () => {
-        activationHelper = await ActivationHelper.createWithConfig(cfg, async (helper, activation, otp) => {
-            // Encrypt inner activation data with fake mobile client
-            let encryptedPayload = client.createActivation({...activationPayload, activationOtp: otp})
-            // Prepare activation on the server
-            let response = await helper.server.activationPrepare({
-                activationCode: activation.activationCode!,
-                applicationKey: helper.appSetup.appKey,
-                ephemeralPublicKey: encryptedPayload.key!,
-                encryptedData: encryptedPayload.body!,
-                mac: encryptedPayload.mac!,
-                nonce: encryptedPayload.nonce!
-            })
-            expect(response).toBeDefined()
-            // Commit activation on the client
-            client.commitActivation(response)
-        })
+        activationHelper = await createActivationHelper(cfg, preapreData)
         server = activationHelper.server
-        client = new FakeMobileClient(activationHelper.appSetup)
     })
 
     afterEach(async () => {
-        await activationHelper.cleanup()
+        await activationHelper?.cleanup()
     })
 
     test('Test create activation with activation code ', async () => {
@@ -81,5 +70,23 @@ describe('Manage PowerAuth applications', () => {
         let activation = await activationHelper.createActivation()
         var status = await activationHelper.getActivationStatus()
         expect(status).toBe(ActivationStatus.ACTIVE)
+    })
+
+    test('Test activation block and unblock', async () => {
+        await activationHelper.createActivation()
+        await activationHelper.blockActivation('TEST-REASON')
+        let detail = await activationHelper.getActivationDetail()
+        expect(detail.activationStatus).toBe(ActivationStatus.BLOCKED)
+        expect(detail.blockedReason).toEqual('TEST-REASON')
+        await activationHelper.unblockActivation()
+        let status = await activationHelper.getActivationStatus()
+        expect(status).toBe(ActivationStatus.ACTIVE)
+    })
+
+    test('Test activation remove', async () => {
+        await activationHelper.createActivation()
+        await activationHelper.removeActivation()
+        let detail = await activationHelper.getActivationDetail()
+        expect(detail.activationStatus).toBe(ActivationStatus.REMOVED)
     })
 })

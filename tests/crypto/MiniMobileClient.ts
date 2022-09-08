@@ -14,10 +14,12 @@
 // limitations under the License.
 //
 
-import { ActivationPrepareResult, ApplicationSetup, Logger } from "../../src";
-import { EcKeyAgreement, EcKeyPair, HMAC_SHA256, SHA256 } from "../crypto/MiniCrypto";
-import { EciesCryptogram, EciesEncryptor } from "../crypto/MiniEcies";
-import { deriveAllSecretKeys, reduceSharedSecret, SignatureKeys } from "../crypto/MiniProtocolUtils";
+import { ActivationPrepareResult, ApplicationSetup } from "../../src";
+import { EcKeyAgreement, EcKeyPair, HMAC_SHA256, SHA256 } from "./MiniCrypto";
+import { EciesCryptogram, EciesEncryptor } from "./MiniEcies";
+import { deriveAllSecretKeys, reduceSharedSecret, SignatureKeys } from "./MiniProtocolUtils";
+
+// TODO: Documentation
 
 export interface CreateActivationData {
     activationName: string
@@ -54,7 +56,7 @@ interface PendingActivationData {
     encryptor: EciesEncryptor
 }
 
-export class FakeMobileClient {
+export class MiniMobileClient {
 
     setup: ApplicationSetup
     activationData: ActivationData | undefined
@@ -86,7 +88,6 @@ export class FakeMobileClient {
         // Encrypt request
         
         let payload = { ...activationData, devicePublicKey: deviceKeyPair.formattedPublicKey() }
-        Logger.info(`Payload to encrypt: ${JSON.stringify(payload)}`)
         return encryptor.encryptRequestObject(payload)
     }
 

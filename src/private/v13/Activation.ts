@@ -20,7 +20,7 @@ import { ActivationDetail, ActivationOtpValidation, ActivationPrepareData, Activ
 
 export interface ActivationInit_Request {
     userId: string
-    applicationId: number
+    applicationId: string
 
     activationOtp?: string
     activationOtpValidation?: ActivationOtpValidation

@@ -203,7 +203,7 @@ class ClientImpl implements ServerAPI {
 
     async activationInit(application: Application, userId: string, otp: string | undefined, otpValidation: ActivationOtpValidation | undefined, maxFailureCount: number | undefined): Promise<Activation> {
         let request = {
-            applicationId: application.applicationId.legacyIdentifier,
+            applicationId: application.applicationId.identifier,
             userId: userId,
             activationOtp: otp,
             activationOtpValidation: otpValidation,
@@ -254,7 +254,7 @@ class ClientImpl implements ServerAPI {
             activationId: activation.activationId,
             externalUserId: externalUserId
         }
-        let response = await this.client.post<ActivationUnblock_Request, ActivationUnblock_Response>(Endpoints.activationBlock, request)
+        let response = await this.client.post<ActivationUnblock_Request, ActivationUnblock_Response>(Endpoints.activationUnblock, request)
         return response.activationStatus
     }
 

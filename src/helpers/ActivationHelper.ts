@@ -26,21 +26,57 @@ import {
     DEFAULT_USER_ID,
     PowerAuthTestServer } from "../index";
 
+/**
+ * Interface that contains data for activation prepare. The content highly depends
+ * on actual PowerAuth mobile SDK implementation, so each parameter is optional.
+ */
+export interface ActivationHelperPrepareData {
+    /**
+     * Password for knowledge factor
+     */
+    password?: string
+    /**
+     * Information whether activation will use also biometry factor.
+     */
+    useBiometry?: boolean
+    /**
+     * OTP in case of OTP validaiton.
+     */
+    otp?: string
+    /**
+     * OTP validation mode.
+     */
+    otpValidation?: ActivationOtpValidation
+    /**
+     * Custom data.
+     */
+    customData?: Map<string, any>
+}
 
-export type ActivationPrepareFunc = (helper: ActivationHelper, activation: Activation, otp: string | undefined) => Promise<void>
+/**
+ * Closure that provides instance of SDK type.
+ */
+export type CreateSdkFunc<SDK> = (appSetup: ApplicationSetup, prepareData: ActivationHelperPrepareData | undefined) => Promise<SDK>
+/**
+ * Closure that implements prepare step.
+ */
+ export type ActivationPrepareFunc<SDK, PrepareResult> = (helper: ActivationHelper<SDK, PrepareResult>, activation: Activation, prepareData: ActivationHelperPrepareData | undefined) => Promise<PrepareResult>
 
 /**
  * The `ActivationHelper` class helps with various activation related tasks.
  */
-export class ActivationHelper {
+export class ActivationHelper<SDK, PrepareResult> {
 
     readonly server: PowerAuthTestServer
     readonly appSetup: ApplicationSetup
-    readonly prepareStep: ActivationPrepareFunc | undefined
 
-    activation: Activation | undefined
+    private activationData: Activation | undefined
+    private sdkInstance: SDK | undefined
+    private prepareData: ActivationHelperPrepareData | undefined
+    private prepareResult: PrepareResult | undefined
 
-    disableAutoCommitSupport = false
+    prepareStep: ActivationPrepareFunc<SDK, PrepareResult> | undefined
+    createSdk: CreateSdkFunc<SDK> | undefined
 
     // Construction
 
@@ -52,11 +88,9 @@ export class ActivationHelper {
     constructor(
         server: PowerAuthTestServer,
         appSetup: ApplicationSetup,
-        prepareStep: ActivationPrepareFunc | undefined = undefined
     ) {
         this.server = server
         this.appSetup = appSetup
-        this.prepareStep = prepareStep
     }
 
     /**
@@ -64,17 +98,15 @@ export class ActivationHelper {
      * guarantees that connection to the server works.
      * @param server `PowerAuthTestServer` instance.
      * @param applicationConfig `ApplicationConfig` instance or undefined, if default configuration will be used.
-     * @param prepareStep Optional closure with prepare step implementation.
      * @returns Promise with `ActivationHelper` instance in result.
      */
-    static async create(
+    static async create<SDK, PrepareResult>(
         server: PowerAuthTestServer,
         applicationConfig: ApplicationConfig | undefined = undefined,
-        prepareStep: ActivationPrepareFunc | undefined = undefined
-    ): Promise<ActivationHelper> {
+    ): Promise<ActivationHelper<SDK, PrepareResult>> {
         await server.connect()
         let appSetup = await server.prepareApplicationFromConfiguration(applicationConfig)
-        return new ActivationHelper(server, appSetup, prepareStep)
+        return new ActivationHelper(server, appSetup)
     }
 
     /**
@@ -83,11 +115,10 @@ export class ActivationHelper {
      * @param config Configuration for `PowerAuthTestServer`.
      * @returns Promise with `ActivationHelper` instance in result.
      */
-    static async createWithConfig(
+    static async createWithConfig<SDK, PrepareResult>(
         config: Config,
-        prepareStep: ActivationPrepareFunc | undefined = undefined
-    ): Promise<ActivationHelper> {
-        return this.create(new PowerAuthTestServer(config), undefined, prepareStep)
+    ): Promise<ActivationHelper<SDK, PrepareResult>> {
+        return this.create(new PowerAuthTestServer(config))
     }
 
     // Getters
@@ -107,10 +138,34 @@ export class ActivationHelper {
     }
 
     /**
+     * Get Activation object. If activation is not known, then throws error.
+     */
+    get activation(): Activation {
+        return this.withActivation(a => a)
+    }
+
+    /**
      * Activation object. If activation is not known, then throws error.
      */
     get activationId(): string {
         return this.withActivation(a => a.activationId)
+    }
+
+    /**
+     * Return SDK instance. If there's no sdkFactory function set, then throws an error.
+     */
+    async getPowerAuthSdk(): Promise<SDK> {
+        return await this.withSDK(a => a)
+    }
+
+    /**
+     * Result from prepare activation step. If result is not available then throws an error.
+     */
+    get prepareActivationResult(): PrepareResult {
+        if (this.prepareActivationResult == undefined) {
+            throw new Error('Result from prepare activation is not available')
+        }
+        return this.prepareActivationResult
     }
 
     /**
@@ -119,10 +174,28 @@ export class ActivationHelper {
      * @returns Type returned from action.
      */
     withActivation<T>(action: (activation: Activation) => T): T {
-        if (this.activation == undefined) {
+        if (this.activationData == undefined) {
             throw new Error('Activation is not available')
         }
-        return action(this.activation)
+        return action(this.activationData)
+    }
+
+    /**
+     * Execute action with valid SDK instance. If there's no sdkFactory function set, then throws an error.
+     * @param action Action to execute.
+     * @returns Type returned from action.
+     */
+    async withSDK<T>(action: (sdk: SDK) => T): Promise<T> {
+        let sdk: SDK
+        if (this.sdkInstance == undefined) {
+            if (this.createSdk == undefined) {
+                throw new Error('SDK factory function is not set')
+            }
+            sdk = this.sdkInstance = await this.createSdk(this.appSetup, this.prepareData)
+        } else {
+            sdk = this.sdkInstance
+        }
+        return action(sdk)
     }
 
     // Activation management
@@ -142,7 +215,7 @@ export class ActivationHelper {
         maxFailureCount: number = DEFAULT_MAX_FAILED_ATTEMPTS
     ): Promise<Activation> {
         let activation = await this.server.activationInit(this.application, userId, otp, otpValidation, maxFailureCount)
-        this.activation = activation
+        this.activationData = activation
         return activation
     }
 
@@ -150,67 +223,95 @@ export class ActivationHelper {
      * Prepare activation. This function works only if helper is created with an optional prepare step.
      * The prepare step typically implements activation preparation with using a mobile SDK library.
      * If prepate step is not defined, then function throws an error.
-     * @param otp Optional OTP that should be used during key-exchange phase of activation.
+     * @param prepareData Data for activation prepare step.
      * @returns Promise with void.
      */
-    async prepareActivation(otp: string | undefined = undefined): Promise<void> {
-        await this.withActivation(async activation => await this.prepareActivationImpl(activation, otp))
+    prepareActivation(prepareData: ActivationHelperPrepareData | undefined = undefined): Promise<PrepareResult> {
+        this.prepareData = prepareData
+        return this.withActivation(activation => this.prepareActivationImpl(activation, prepareData))
     }
 
     /**
      * Prepare activation implementation.
      */
-    private async prepareActivationImpl(activation: Activation, otp: string | undefined): Promise<void> {
+    private prepareActivationImpl(activation: Activation, data: ActivationHelperPrepareData | undefined): Promise<PrepareResult> {
         if (this.prepareStep == undefined) {
             throw new Error('Missing prepare step in ActivationHelper')
         }
-        await this.prepareStep(this, activation, otp)
+        return this.prepareStep(this, activation, data)
     }
 
     /**
      * Commit activation.
      * @param otp Optional OTP, that should be used during commit phase of activation.
+     * @param externalUserId Optional external user identifier.
      * @returns Promise with void.
      */
-    async commitActivation(otp: string | undefined = undefined): Promise<void> {
-        await this.withActivation(async activation => await this.server.activationCommit(activation, otp))
+    async commitActivation(otp: string | undefined = undefined, externalUserId: string | undefined = undefined): Promise<void> {
+        let result = await this.withActivation(activation => this.server.activationCommit(activation, otp, externalUserId))
+        if (!result) throw new Error('Failed to comit activation')
     }
 
     /**
      * Initialize, prepare and commit activation in one function.
      * @param userId User identifier. If nothing is provided, then default user identifier will be used.
-     * @param otp Optional activation OTP.
-     * @param otpValidation Optional activation OTP validation mode, that must be provided together with OTP.
+     * @param prepareData Data for activation prepare step.
      * @param maxFailureCount Optional maximum failure count. If not provided, value 5 will be used.
      * @returns Promise with `Activation` object in result.
      */
     async createActivation(
         userId: string = this.userId,
-        otp: string | undefined = undefined,
-        otpValidation: ActivationOtpValidation | undefined = undefined,
+        prepareData: ActivationHelperPrepareData | undefined = undefined,
         maxFailureCount: number = DEFAULT_MAX_FAILED_ATTEMPTS
     ): Promise<Activation> {
+        let otpValidation = prepareData?.otpValidation
+        let otp = otpValidation == ActivationOtpValidation.ON_COMMIT ? prepareData?.otp : undefined
         let activation = await this.initActivation(userId, otp, otpValidation, maxFailureCount)
-        let otpOnKeyExchange = otp != undefined && otp == ActivationOtpValidation.ON_KEY_EXCHANGE ? otp : undefined
-        let otpOnCommit = otp != undefined && otp == ActivationOtpValidation.ON_COMMIT ? otp : undefined
-        await this.prepareActivationImpl(activation, otpOnKeyExchange)
+        await this.prepareActivationImpl(activation, prepareData)
         let status = await this.getActivationStatus()
         if (status == ActivationStatus.PENDING_COMMIT) {
-            await this.commitActivation(otpOnCommit)
+            await this.commitActivation(otp)
+        } else if (status != ActivationStatus.ACTIVE) {
+            throw new Error(`Activation is in wrong state after create. State = ${status}`)
         }
         return activation
     }
 
     /**
-     * Remove activation. Function throws an error if no such activation is available.
-     * @returns Void promise.
+     * Remove activation.
+     * @param revokeRecoveryCodes If true (default) then also revokes all recovery codes associated with the activation.
+     * @param externalUserId Optional external user identifier.
+     * @returns Void promise. 
      */
     async removeActivation(revokeRecoveryCodes: boolean = true, externalUserId: string | undefined = undefined): Promise<void> {
         return await this.withActivation(async activation => {
-            let status = (await this.server.getActivationDetil(activation)).activationStatus
-            if (status != ActivationStatus.REMOVED) {
-                await this.server.activationRemove(activation, revokeRecoveryCodes, externalUserId)
-            }
+            let removed = await this.server.activationRemove(activation, revokeRecoveryCodes, externalUserId)
+            if (!removed) throw new Error('Failed to remove activation')
+        })
+    }
+
+    /**
+     * Block activation. 
+     * @param reason Optional reason for activation block.
+     * @param externalUserId Optional external user identifier.
+     * @returns Void promise.
+     */
+    async blockActivation(reason: string | undefined = undefined, externalUserId: string | undefined = undefined): Promise<void> {
+        return await this.withActivation(async activation => {
+            let blocked = await this.server.activationBlock(activation, reason, externalUserId)
+            if (!blocked) throw new Error('Failed to block activation')
+        })
+    }
+
+    /**
+     * Unblock activation. 
+     * @param externalUserId Optional external user identifier.
+     * @returns Void promise.
+     */
+    async unblockActivation(externalUserId: string | undefined = undefined): Promise<void> {
+        return await this.withActivation(async activation => {
+            let active = await this.server.activationUnblock(activation, externalUserId)
+            if (!active) throw new Error('Failed to unblock activation')
         })
     }
 
@@ -227,9 +328,9 @@ export class ActivationHelper {
      * @param challenge Optional challenge. If provided, then V3.1 status blob is also produced in detail.
      * @returns Promise with `ActivationDetail` in result.
      */
-    async getActivationDetail(challenge: string | undefined = undefined): Promise<ActivationDetail> {
-        return await this.withActivation(async (activation) => {
-            return await this.server.getActivationDetil(activation, challenge)
+    getActivationDetail(challenge: string | undefined = undefined): Promise<ActivationDetail> {
+        return this.withActivation(activation => {
+            return this.server.getActivationDetil(activation, challenge)
         })        
     }
 
@@ -238,10 +339,11 @@ export class ActivationHelper {
      */
     async cleanup(): Promise<void> {
         try {
-            await this.removeActivation()
+            if (await this.getActivationStatus() != ActivationStatus.REMOVED) {
+                await this.removeActivation()
+            }
         } catch (error) {
             // We don't care about errors in this function.
         }
     }
-
 }

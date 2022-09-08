@@ -95,16 +95,16 @@ export class PowerAuthTestServer {
      * @param failIfNoOK If `true` then function fail if status is not OK.
      * @returns Promise with SystemStatus received from the server.
      */
-    async getSystemStatus(failIfNoOK: boolean = true): Promise<SystemStatus> {
-        return await this.api.getSystemStatus(failIfNoOK)
+    getSystemStatus(failIfNoOK: boolean = true): Promise<SystemStatus> {
+        return this.api.getSystemStatus(failIfNoOK)
     }
 
     /**
      * Validate connection to the server and return server's version.
      * @returns Promise with Version of PowerAuth Server.
      */
-    async getServerVersion(): Promise<ServerVersion> {
-        return await this.api.getServerVersion()
+    getServerVersion(): Promise<ServerVersion> {
+        return this.api.getServerVersion()
     }
 
 
@@ -134,7 +134,7 @@ export class PowerAuthTestServer {
      * Get list of all applications.
      * @returns Promise with array of `Application` objects in a result.
      */
-    async getApplicationList(): Promise<Array<Application>> {
+    getApplicationList(): Promise<Array<Application>> {
         return this.api.getApplicationList()
     }
 
@@ -143,7 +143,7 @@ export class PowerAuthTestServer {
      * @param application Application object
      * @returns Promise with `ApplicationDetail` in a result.
      */
-    async getApplicationDetail(application: Application): Promise<ApplicationDetail> {
+    getApplicationDetail(application: Application): Promise<ApplicationDetail> {
         return this.api.getApplicationDetail(application)
     }
 
@@ -152,7 +152,7 @@ export class PowerAuthTestServer {
      * @param applicationName Name of new application.
      * @returns Promise with `Application` object in result.
      */
-    async createApplication(applicationName: string): Promise<Application> {
+    createApplication(applicationName: string): Promise<Application> {
         return this.api.createApplication(applicationName)
     }
 
@@ -162,7 +162,7 @@ export class PowerAuthTestServer {
      * @param versionName New application's version.
      * @returns Promise with `ApplicationVersion` in a result.
      */
-    async createApplicationVersion(application: Application, versionName: string): Promise<ApplicationVersion> {
+    createApplicationVersion(application: Application, versionName: string): Promise<ApplicationVersion> {
         return this.api.createApplicationVersion(application, versionName)
     }
 
@@ -227,8 +227,8 @@ export class PowerAuthTestServer {
      * @param application Application object.
      * @returns Promise with `RecoveryConfig` object in result.
      */
-    async getRecoveryConfig(application: Application): Promise<RecoveryConfig> {
-        return await this.api.getRecoveryConfig(application)
+    getRecoveryConfig(application: Application): Promise<RecoveryConfig> {
+        return this.api.getRecoveryConfig(application)
     }
 
     /**
@@ -236,8 +236,8 @@ export class PowerAuthTestServer {
      * @param recoveryConfig Recovery config to apply to the server.
      * @returns Promise with boolean in result.
      */
-    async updateRecoveryConfig(recoveryConfig: RecoveryConfig): Promise<boolean> {
-        return await this.api.updateRecoveryConfig(recoveryConfig)
+    updateRecoveryConfig(recoveryConfig: RecoveryConfig): Promise<boolean> {
+        return this.api.updateRecoveryConfig(recoveryConfig)
     }
 
 
@@ -253,14 +253,14 @@ export class PowerAuthTestServer {
      * @param maxFailureCount Optional maximum failure count. If not provided, value 5 will be used.
      * @returns Promise with `Activation` object in result.
      */
-     async activationInit(
+     activationInit(
         application: Application,
         userId: string,
         otp: string | undefined = undefined,
         otpValidation: ActivationOtpValidation | undefined = undefined,
         maxFailureCount: number | undefined = DEFAULT_MAX_FAILED_ATTEMPTS
     ): Promise<Activation> {
-        return await this.api.activationInit(application, userId, otp, otpValidation, maxFailureCount)
+        return this.api.activationInit(application, userId, otp, otpValidation, maxFailureCount)
     }
     
     /**
@@ -270,12 +270,12 @@ export class PowerAuthTestServer {
      * @param externalUserId Optional external user identifier.
      * @returns Promise with boolean in result.
      */
-    async activationUpdateOtp(
+    activationUpdateOtp(
         activation: Activation,
         otp: string,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return await this.api.activationUpdateOtp(activation, otp, externalUserId)
+        return this.api.activationUpdateOtp(activation, otp, externalUserId)
     }
 
     /**
@@ -285,12 +285,12 @@ export class PowerAuthTestServer {
      * @param externalUserId Optional external user identifier.
      * @returns Promise with boolean in result.
      */
-    async activationCommit(
+    activationCommit(
         activation: Activation,
         otp: string | undefined = undefined,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return await this.api.activationCommit(activation, otp, externalUserId)
+        return this.api.activationCommit(activation, otp, externalUserId)
     }
 
     /**
@@ -328,12 +328,12 @@ export class PowerAuthTestServer {
      * @param externalUserId Optional external user identifier.
      * @returns Promise with boolean in result.
      */
-    async activationRemove(
+    activationRemove(
         activation: Activation,
         revokeRecoveryCodes: boolean = true,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return await this.api.activationRemove(activation, revokeRecoveryCodes, externalUserId)
+        return this.api.activationRemove(activation, revokeRecoveryCodes, externalUserId)
     }
 
     /**
@@ -342,8 +342,8 @@ export class PowerAuthTestServer {
      * @param challenge If provided, then also encrypted status blob V3.1 is returend.
      * @returns Promise with `ActivationDetail` in result.
      */
-    async getActivationDetil(activation: Activation, challenge: string | undefined = undefined): Promise<ActivationDetail> {
-        return await this.api.getActivationDetail(activation, challenge)
+    getActivationDetil(activation: Activation, challenge: string | undefined = undefined): Promise<ActivationDetail> {
+        return this.api.getActivationDetail(activation, challenge)
     }
 
     /**
@@ -352,7 +352,7 @@ export class PowerAuthTestServer {
      * @param data Activation data
      * @returns Promise with `ActivationPrepareResult` in result.
      */
-    async activationPrepare(data: ActivationPrepareData): Promise<ActivationPrepareResult> {
-        return await this.api.activationPrepare(data)
+    activationPrepare(data: ActivationPrepareData): Promise<ActivationPrepareResult> {
+        return this.api.activationPrepare(data)
     }
 }
