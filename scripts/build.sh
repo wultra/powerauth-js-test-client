@@ -62,8 +62,9 @@ function DO_BUILD
 {
     LOG_LINE
     LOG "Building '$LIB_NAME'..."
-    LOG " - npm version $(npm -v)"
-    LOG " - tsc version $TSC_VERSION"
+    LOG " - node version $NODE_VERSION"
+    LOG " - npm  version $NPM_VERSION"
+    LOG " - tsc  version $TSC_VERSION"
     LOG_LINE
 
     PUSH_DIR "$SRC_ROOT"
@@ -90,8 +91,9 @@ function DO_COMPILE
 {
     LOG_LINE
     LOG "Compiling '$LIB_NAME' with all tests..."
-    LOG " - npm version $(npm -v)"
-    LOG " - tsc version $TSC_VERSION"
+    LOG " - node version $NODE_VERSION"
+    LOG " - npm  version $NPM_VERSION"
+    LOG " - tsc  version $TSC_VERSION"
     LOG_LINE
 
     PUSH_DIR "$SRC_ROOT"
@@ -118,8 +120,9 @@ function DO_TEST
 
     LOG_LINE
     LOG "Testing '$LIB_NAME'..."
-    LOG " - npm version  $(npm -v)"
-    LOG " - tsc version  $TSC_VERSION"
+    LOG " - node version $NODE_VERSION"
+    LOG " - npm  version $NPM_VERSION"
+    LOG " - tsc  version $TSC_VERSION"
     LOG " - jest version $($JEST --version)"
     LOG_LINE
 
@@ -166,9 +169,13 @@ done
 
 REQUIRE_COMMAND tsc
 REQUIRE_COMMAND npm
+REQUIRE_COMMAND node
 
 TSC_VERSION=( $(tsc --version))
 TSC_VERSION=${TSC_VERSION[1]}
+NODE_VERSION=$(node -v)
+NODE_VERSION=${NODE_VERSION:1}
+NPM_VERSION=$(npm -v)
 
 case "$DO_COMMAND" in
     build) DO_BUILD ;;
