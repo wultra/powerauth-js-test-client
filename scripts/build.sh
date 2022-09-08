@@ -29,6 +29,12 @@ function USAGE
     echo "                      This is the default command if no"
     echo "                      command is specified."
     echo ""
+    echo "     compile          Compile library and tests"
+    echo ""
+    echo "     test             Run jest tests"
+    echo ""
+    echo "     test-verbose     Run jest tests with full log"
+    echo ""
     echo "options are:"
     echo "    -v0               turn off all prints to stdout"
     echo "    -v1               print only basic log about build progress"
@@ -36,6 +42,17 @@ function USAGE
     echo "    -h | --help       print this help information"
     echo ""
     exit $1
+}
+
+# -----------------------------------------------------------------------------
+# Cleanum dist folder
+# -----------------------------------------------------------------------------
+function DIST_CLEANUP
+{
+    LOG "Removing dist folder..."
+    if [ -d "$SRC_ROOT/dist" ]; then
+        $RM -r "$SRC_ROOT/dist"
+    fi
 }
 
 # -----------------------------------------------------------------------------
@@ -52,13 +69,68 @@ function DO_BUILD
     PUSH_DIR "$SRC_ROOT"
     ###
 
+    DIST_CLEANUP
+
     LOG "Compiling TypeScript..."
-    npm run build
+    tsc
 
     LOG "Removing old packages..."
 
     LOG "Creating npm package..."
     npm pack
+
+    ###
+    POP_DIR    
+}
+
+# -----------------------------------------------------------------------------
+# Compile library and tests
+# -----------------------------------------------------------------------------
+function DO_COMPILE
+{
+    LOG_LINE
+    LOG "Compiling '$LIB_NAME' with all tests..."
+    LOG " - npm version $(npm -v)"
+    LOG " - tsc version $TSC_VERSION"
+    LOG_LINE
+
+    PUSH_DIR "$SRC_ROOT"
+    ###
+
+    DIST_CLEANUP
+
+    LOG "Compiling TypeScript..."
+    tsc -p tsconfig.tests.json
+
+    ###
+    POP_DIR    
+}
+
+# -----------------------------------------------------------------------------
+# Compile library and tests
+# -----------------------------------------------------------------------------
+function DO_TEST
+{
+    local JEST_OPT=$1
+    PUSH_DIR "$SRC_ROOT"
+    ###
+    JEST='./node_modules/.bin/jest'
+
+    LOG_LINE
+    LOG "Testing '$LIB_NAME'..."
+    LOG " - npm version  $(npm -v)"
+    LOG " - tsc version  $TSC_VERSION"
+    LOG " - jest version $($JEST --version)"
+    LOG_LINE
+
+    DIST_CLEANUP
+
+    LOG "Compiling TypeScript..."
+    tsc
+
+    LOG "Running tests..."
+
+    $JEST $JEST_OPT
 
     ###
     POP_DIR    
@@ -76,10 +148,10 @@ while [[ $# -gt 0 ]]
 do
     opt="$1"
     case "$opt" in
-        build)
+        build | test | test-verbose | compile)
             DO_COMMAND=$opt
             ;;
-        -h | --help)
+        -h | --help | help)
             USAGE 0
             ;;
         -v*)
@@ -100,6 +172,9 @@ TSC_VERSION=${TSC_VERSION[1]}
 
 case "$DO_COMMAND" in
     build) DO_BUILD ;;
+    compile) DO_COMPILE ;;
+    test) DO_TEST --silent ;;
+    test-verbose) DO_TEST ;;
     *) FAILURE "Unknown command '$DO_COMMAND'"
 esac
 

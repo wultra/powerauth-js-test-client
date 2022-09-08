@@ -15,13 +15,13 @@
 //
 
 import { testServerConfiguration } from "./config/config";
-import { ApplicationWithVersion, Config, Logger, PowerAuthTestServer } from "../src/index";
+import { ApplicationSetup, Config, Logger, PowerAuthTestServer } from "../src/index";
 
 describe('Manage PowerAuth applications', () => {
 
     var cfg: Config
     var server: PowerAuthTestServer
-    var app: ApplicationWithVersion
+    var app: ApplicationSetup
 
     beforeAll(async () => {
         cfg = await testServerConfiguration()

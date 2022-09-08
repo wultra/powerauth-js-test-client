@@ -11,10 +11,10 @@
     "dist/*.*"
   ],
   "scripts": {
-    "test": "tsc && jest --silent",
-    "test-verbose": "tsc && jest",
-    "build": "rm -r dist && tsc",
-    "build-test": "rm -r dist && tsc"
+    "test": "./scripts/build.sh test",
+    "test-verbose": "./scripts/build.sh test-verbose",
+    "build": "./scripts/build.sh",
+    "build-test": "./scripts/build.sh compile"
   },
   "repository": {
     "type": "git",
