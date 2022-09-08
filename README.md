@@ -1,5 +1,7 @@
 # PowerAuth Test Client for JavaScript
 
+[![npm](https://img.shields.io/npm/v/react-native-powerauth-mobile-sdk)](https://www.npmjs.com/package/react-native-powerauth-mobile-sdk) ![license](https://img.shields.io/github/license/wultra/react-native-powerauth-mobile-sdk) ![released](https://img.shields.io/github/release-date/wultra/react-native-powerauth-mobile-sdk)
+
 This library provides client written in TypeScript that allows you to conenct directly to the [PowerAuth Server's RESTful API](https://github.com/wultra/powerauth-server/blob/develop/docs/WebServices-Methods.md). This is useful for various integration testing purposes for projects that needs to test the functionality against real [PowerAuth Server](https://github.com/wultra/powerauth-server).
 
 <!-- begin box warning -->
