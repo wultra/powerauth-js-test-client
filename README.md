@@ -46,18 +46,23 @@ type RNActivationHelper = ActivationHelper<PowerAuth, PowerAuthCreateActivationR
 
 const PA_SERVER_URL = "http://localhost:8080/powerauth-java-server"
 const PA_ENROLLMENT = "http://localhost:8080/enrollment-server"
+const PA_INSTANCE = 'your-app-instance-id'
+
+export interface CustomActivationHelperPrepareData extends ActivationHelperPrepareData {
+    instanceId?: string
+}
 
 /**
  * Function create instnace of activation helper typed with RN wrapper objects.
  */
 async function getActivationHelper(): Promise<RNActivationHelper> {
     const cfg = { connection: { baseUrl: PA_SERVER_URL}}
-    const helper = await ActivationHelper.createWithConfig<PowerAuth>(cfg)
+    const helper: RNActivationHelper = await ActivationHelper.createWithConfig(cfg)
     helper.createSdk = async (appSetup, prepareData) => {
         // Prepare instanceId. We're using custom data in prepare interface to keep instance id.
-        const instanceId = prepareData?.customData?.get('instanceId') ?? 'your-app-instance-id'
+        const instanceId = (prepareData as CustomActivationHelperPrepareData).instanceId ?? PA_INSTANCE
         const sdk = new PowerAuth(instanceId)
-        if (sdk.isConfigured()) {
+        if (await sdk.isConfigured()) {
             await sdk.deconfigure() // depending on whether you expect config changes
         }
         const unsecure = PA_ENROLLMENT.startsWith('http://')
@@ -67,7 +72,7 @@ async function getActivationHelper(): Promise<RNActivationHelper> {
     helper.prepareStep = async (helper, activation, prepareData) => {
         if (!prepareData) throw new Error('Missing prepare data object')
         if (!prepareData.password) throw new Error('Missing password in prepare data object')
-        const sdk = helper.getPowerAuthSdk()
+        const sdk = await helper.getPowerAuthSdk()
         const deviceName = 'Test device'
         const activationData = PowerAuthActivation.createWithActivationCode(activation.activationCode!, deviceName)
         // Create activation
@@ -89,7 +94,7 @@ async function getActivationHelper(): Promise<RNActivationHelper> {
 /**
  * Function prepare activation to active state.
  */
-async function prepareActivationWithHelper(prepareData: ActivationHelperPrepareData): Promise<RNActivationHelper> {
+async function prepareActivationWithHelper(prepareData: CustomActivationHelperPrepareData): Promise<RNActivationHelper> {
     const config = { connection: { baseUrl: PA_SERVER_URL }}
     const helper = await createActivationHelper(config, prepareData)
     await helper.createActivation(helper.userId, prepareData)
