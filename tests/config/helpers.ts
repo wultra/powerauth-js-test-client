@@ -20,22 +20,25 @@ import { testServerConfiguration } from "./config";
 
 export type TypedActivationHelper = ActivationHelper<MiniMobileClient, boolean>
 
+export interface CustomActivationHelperPrepareData extends ActivationHelperPrepareData {
+    activationPayload?: CreateActivationData
+}
+
 /**
  * Create activation helper with configured prepare step. This helper can automatically create activation
  * and move it to 'ACTIVE' state.
  */
-export async function createActivationHelper(config: Config | undefined = undefined, prepareData: ActivationHelperPrepareData | undefined = undefined): Promise<TypedActivationHelper> {
+export async function createActivationHelper(config: Config | undefined = undefined, prepareData: CustomActivationHelperPrepareData | undefined = undefined): Promise<TypedActivationHelper> {
     // Acquire config
     const cfg = config ?? await testServerConfiguration()
-    const activationData = prepareData?.customData?.get('activationPayload') as CreateActivationData
-    const activationPayload = activationData ?? {
+    const activationPayload = prepareData?.activationPayload ?? {
         activationName: 'activation-test',
         platform: 'nodejs',
         deviceInfo: 'nodejs-tests',
         extras: 'some-extras'
     }
     // Create activation helper with using MiniMobileClient as SDK implementation
-    const helper = await ActivationHelper.createWithConfig<MiniMobileClient,boolean>(cfg)
+    const helper: TypedActivationHelper = await ActivationHelper.createWithConfig(cfg)
     helper.createSdk = async (appSetup, _) => {
         return new MiniMobileClient(appSetup)
     }
@@ -63,7 +66,7 @@ export async function createActivationHelper(config: Config | undefined = undefi
 /**
  * Create fully prepared activation in ACTIVE state.
  */
-export async function createActivationWithActivationHelper(config: Config | undefined = undefined, prepareData: ActivationHelperPrepareData | undefined = undefined): Promise<TypedActivationHelper> {
+export async function createActivationWithActivationHelper(config: Config | undefined = undefined, prepareData: CustomActivationHelperPrepareData | undefined = undefined): Promise<TypedActivationHelper> {
     const helper = await createActivationHelper(config, prepareData)
     await helper.createActivation(helper.userId, prepareData)
     return helper

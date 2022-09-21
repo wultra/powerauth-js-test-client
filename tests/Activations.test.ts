@@ -17,7 +17,7 @@
 import { testServerConfiguration } from "./config/config";
 import { ActivationHelper, ActivationHelperPrepareData, ActivationStatus, Config, Logger, PowerAuthTestServer } from "../src/index";
 import { CreateActivationData, MiniMobileClient } from "./crypto/MiniMobileClient";
-import { createActivationHelper } from "./config/helpers";
+import { createActivationHelper, CustomActivationHelperPrepareData } from "./config/helpers";
 
 
 const activationPayload: CreateActivationData = {
@@ -26,10 +26,9 @@ const activationPayload: CreateActivationData = {
     deviceInfo: 'nodejs-tests',
     extras: 'some-extras'
 }
-const preapreData: ActivationHelperPrepareData = {
-    customData: new Map<string, any>()
+const preapreData: CustomActivationHelperPrepareData = {
+    activationPayload: activationPayload
 }
-preapreData.customData!.set('activationPayload', activationPayload)
 
 describe('Manage PowerAuth applications', () => {
 
@@ -68,6 +67,7 @@ describe('Manage PowerAuth applications', () => {
 
     test('Test automatic activation create ', async () => {
         const activation = await activationHelper.createActivation()
+        expect(activationHelper.powerAuthSdk).toBeDefined()
         let status = await activationHelper.getActivationStatus()
         expect(status).toBe(ActivationStatus.ACTIVE)
     })

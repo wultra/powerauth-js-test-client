@@ -47,10 +47,6 @@ export interface ActivationHelperPrepareData {
      * OTP validation mode.
      */
     otpValidation?: ActivationOtpValidation
-    /**
-     * Custom data.
-     */
-    customData?: Map<string, any>
 }
 
 /**
@@ -156,6 +152,16 @@ export class ActivationHelper<SDK, PrepareResult> {
      */
     async getPowerAuthSdk(): Promise<SDK> {
         return await this.withSDK(a => a)
+    }
+
+    /**
+     * Return SDK instance. If there's no such instance available, then throws an error.
+     */
+    get powerAuthSdk(): SDK {
+        if (!this.sdkInstance) {
+            throw new Error('PowerAuth SDK instance is not available')
+        }
+        return this.sdkInstance
     }
 
     /**
