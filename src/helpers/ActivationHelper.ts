@@ -233,7 +233,6 @@ export class ActivationHelper<SDK, PrepareResult> {
      * @returns Promise with void.
      */
     async prepareActivation(prepareData: ActivationHelperPrepareData | undefined = undefined): Promise<PrepareResult> {
-        this.prepareData = prepareData
         this.prepareResultData = await this.withActivation(activation => this.prepareActivationImpl(activation, prepareData))
         return this.prepareResultData
     }
@@ -245,6 +244,7 @@ export class ActivationHelper<SDK, PrepareResult> {
         if (!this.prepareStep) {
             throw new Error('Missing prepare step in ActivationHelper')
         }
+        this.prepareData = data
         return this.prepareStep(this, activation, data)
     }
 
