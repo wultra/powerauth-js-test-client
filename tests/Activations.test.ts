@@ -89,4 +89,11 @@ describe('Manage PowerAuth applications', () => {
         const detail = await activationHelper.getActivationDetail()
         expect(detail.activationStatus).toBe(ActivationStatus.REMOVED)
     })
+
+    test('Test activation remove with ID', async () => {
+        await activationHelper.createActivation()
+        await server.activationRemove(activationHelper.activationId)
+        const detail = await activationHelper.getActivationDetail()
+        expect(detail.activationStatus).toBe(ActivationStatus.REMOVED)
+    })
 })

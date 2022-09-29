@@ -217,9 +217,9 @@ class ClientImpl implements ServerAPI {
         }
     }
 
-    async activationUpdateOtp(activation: Activation, otp: string, externalUserId: string | undefined): Promise<boolean> {
+    async activationUpdateOtp(activationId: string, otp: string, externalUserId: string | undefined): Promise<boolean> {
         const request = {
-            activationId: activation.activationId,
+            activationId: activationId,
             activationOtp: otp,
             externalUserId: externalUserId
         }
@@ -227,9 +227,9 @@ class ClientImpl implements ServerAPI {
         return response.updated        
     }
 
-    async activationCommit(activation: Activation, otp: string | undefined, externalUserId: string | undefined): Promise<boolean> {
+    async activationCommit(activationId: string, otp: string | undefined, externalUserId: string | undefined): Promise<boolean> {
         const request = {
-            activationId: activation.activationId,
+            activationId: activationId,
             activationOtp: otp,
             externalUserId: externalUserId
         }
@@ -237,9 +237,9 @@ class ClientImpl implements ServerAPI {
         return response.activated
     }
 
-    async activationBlock(activation: Activation, reason: string | undefined, externalUserId: string | undefined): Promise<ActivationStatus> {
+    async activationBlock(activationId: string, reason: string | undefined, externalUserId: string | undefined): Promise<ActivationStatus> {
         const request = {
-            activationId: activation.activationId,
+            activationId: activationId,
             reason: reason,
             externalUserId: externalUserId
         }
@@ -247,18 +247,18 @@ class ClientImpl implements ServerAPI {
         return response.activationStatus
     }
 
-    async activationUnblock(activation: Activation, externalUserId: string | undefined): Promise<ActivationStatus> {
+    async activationUnblock(activationId: string, externalUserId: string | undefined): Promise<ActivationStatus> {
         const request = {
-            activationId: activation.activationId,
+            activationId: activationId,
             externalUserId: externalUserId
         }
         const response = await this.client.post<ActivationUnblock_Request, ActivationUnblock_Response>(Endpoints.activationUnblock, request)
         return response.activationStatus
     }
 
-    async activationRemove(activation: Activation, revokeRecoveryCodes: boolean, externalUserId: string | undefined): Promise<boolean> {
+    async activationRemove(activationId: string, revokeRecoveryCodes: boolean, externalUserId: string | undefined): Promise<boolean> {
         const request = {
-            activationId: activation.activationId,
+            activationId: activationId,
             revokeRecoveryCodes: revokeRecoveryCodes,
             externalUserId: externalUserId
         }
@@ -266,9 +266,9 @@ class ClientImpl implements ServerAPI {
         return response.removed
     }
 
-    async getActivationDetail(activation: Activation, challenge: string | undefined): Promise<ActivationDetail> {
+    async getActivationDetail(activationId: string, challenge: string | undefined): Promise<ActivationDetail> {
         const request = {
-            activationId: activation.activationId,
+            activationId: activationId,
             challenge: challenge
         }
         return await this.client.post<ActivationStatus_Request, ActivationStatus_Response>(Endpoints.activationDetail, request)

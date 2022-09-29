@@ -136,74 +136,74 @@ export interface ServerAPI {
     
     /**
      * Update activation OTP on the server.
-     * @param activation Activation object.
+     * @param activationId Activation identifier.
      * @param otp New activation OTP.
      * @param externalUserId Optional external user identifier.
      * @returns Promise with boolean in result.
      */
     activationUpdateOtp(
-        activation: Activation,
+        activationId: string,
         otp: string,
         externalUserId: string | undefined
     ): Promise<boolean>
 
     /**
      * Commit activation on the server.
-     * @param activation Activation object.
+     * @param activationId Activation identifier.
      * @param otp Optional OTP, in case that OTP is expected in this phase.
      * @param externalUserId Optional external user identifier.
      * @returns Promise with boolean in result.
      */
     activationCommit(
-        activation: Activation,
+        activationId: string,
         otp: string | undefined,
         externalUserId: string | undefined
     ): Promise<boolean>
 
     /**
      * Set activation blocked on the server.
-     * @param activation Activation object.
+     * @param activationId Activation identifier.
      * @param reason Optional block reason.
      * @param externalUserId Optional external user identifier.
      * @returns Promise with boolean in result.
      */
     activationBlock(
-        activation: Activation,
+        activationId: Activation | string,
         reason: string | undefined,
         externalUserId: string | undefined
     ): Promise<ActivationStatus>
 
     /**
      * Set activation unblocked on the server.
-     * @param activation Activation object.
+     * @param activationId Activation identifier.
      * @param externalUserId Optional external user identifier.
      * @returns Promise with boolean in result.
      */
     activationUnblock(
-        activation: Activation,
+        activationId: string,
         externalUserId: string | undefined
     ): Promise<ActivationStatus>
 
     /**
      * Remove activation on the server.
-     * @param activation Activation object.
+     * @param activationId Activation identifier.
      * @param revokeRecoveryCodes If true, then also revoke recovery codes associated to this activation.
      * @param externalUserId Optional external user identifier.
      * @returns Promise with boolean in result.
      */
     activationRemove(
-        activation: Activation,
+        activationId: string,
         revokeRecoveryCodes: boolean,
         externalUserId: string | undefined
     ): Promise<boolean>
 
     /**
      * Get activation detail from the server.
-     * @param activation Activation object.
+     * @param activationId Activation identifier.
      * @param challenge If provided, then also encrypted status blob V3.1 is returend.
      * @returns Promise with `ActivationDetail` in result.
      */
-    getActivationDetail(activation: Activation, challenge: string | undefined): Promise<ActivationDetail>
+    getActivationDetail(activationId: string, challenge: string | undefined): Promise<ActivationDetail>
 
     /**
      * Prepare activation. This call is typically used in RESTful integration layer to process activation 

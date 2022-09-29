@@ -265,17 +265,17 @@ export class PowerAuthTestServer {
     
     /**
      * Update activation OTP on the server.
-     * @param activation Activation object.
+     * @param activation Activation object or string with activation identifier.
      * @param otp New activation OTP.
      * @param externalUserId Optional external user identifier.
      * @returns Promise with boolean in result.
      */
     activationUpdateOtp(
-        activation: Activation,
+        activation: Activation | string,
         otp: string,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return this.api.activationUpdateOtp(activation, otp, externalUserId)
+        return this.api.activationUpdateOtp(activationId(activation), otp, externalUserId)
     }
 
     /**
@@ -286,64 +286,64 @@ export class PowerAuthTestServer {
      * @returns Promise with boolean in result.
      */
     activationCommit(
-        activation: Activation,
+        activation: Activation | string,
         otp: string | undefined = undefined,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return this.api.activationCommit(activation, otp, externalUserId)
+        return this.api.activationCommit(activationId(activation), otp, externalUserId)
     }
 
     /**
      * Set activation blocked on the server.
-     * @param activation Activation object.
+     * @param activation Activation object or string with activation identifier.
      * @param reason Optional block reason.
      * @param externalUserId Optional external user identifier.
      * @returns Promise with boolean in result.
      */
     async activationBlock(
-        activation: Activation,
+        activation: Activation | string,
         reason: string | undefined = undefined,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return await this.api.activationBlock(activation, reason, externalUserId) == ActivationStatus.BLOCKED
+        return await this.api.activationBlock(activationId(activation), reason, externalUserId) == ActivationStatus.BLOCKED
     }
 
     /**
      * Set activation unblocked on the server.
-     * @param activation Activation object.
+     * @param activation Activation object or string with activation identifier.
      * @param externalUserId Optional external user identifier.
      * @returns Promise with boolean in result.
      */
     async activationUnblock(
-        activation: Activation,
+        activation: Activation | string,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return await this.api.activationUnblock(activation, externalUserId) == ActivationStatus.ACTIVE
+        return await this.api.activationUnblock(activationId(activation), externalUserId) == ActivationStatus.ACTIVE
     }
 
     /**
      * Remove activation on the server.
-     * @param activation Activation object.
+     * @param activation Activation object or string with activation identifier.
      * @param revokeRecoveryCodes If true, then also revoke recovery codes associated to this activation.
      * @param externalUserId Optional external user identifier.
      * @returns Promise with boolean in result.
      */
     activationRemove(
-        activation: Activation,
+        activation: Activation | string,
         revokeRecoveryCodes: boolean = true,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return this.api.activationRemove(activation, revokeRecoveryCodes, externalUserId)
+        return this.api.activationRemove(activationId(activation), revokeRecoveryCodes, externalUserId)
     }
 
     /**
      * Get activation detail from the server.
-     * @param activation Activation object.
+     * @param activation Activation object or string with activation identifier.
      * @param challenge If provided, then also encrypted status blob V3.1 is returend.
      * @returns Promise with `ActivationDetail` in result.
      */
-    getActivationDetil(activation: Activation, challenge: string | undefined = undefined): Promise<ActivationDetail> {
-        return this.api.getActivationDetail(activation, challenge)
+    getActivationDetil(activation: Activation | string, challenge: string | undefined = undefined): Promise<ActivationDetail> {
+        return this.api.getActivationDetail(activationId(activation), challenge)
     }
 
     /**
@@ -355,4 +355,16 @@ export class PowerAuthTestServer {
     activationPrepare(data: ActivationPrepareData): Promise<ActivationPrepareResult> {
         return this.api.activationPrepare(data)
     }
+}
+
+/**
+ * Helper function translate Activation object or string with activation ID into activation id. 
+ * @param activation Activation object or string with activation id.
+ * @returns Activation id.
+ */
+function activationId(activation: Activation | string): string {
+    if (typeof activation === 'string') {
+        return activation
+    }
+    return activation.activationId
 }
