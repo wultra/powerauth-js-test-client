@@ -72,10 +72,12 @@ function DO_BUILD
 
     DIST_CLEANUP
 
+    LOG "Removing old packages..."
+    local file=( ${LIB_NAME}*.tgz )
+    [[ -f "$file" ]] && $RM ${LIB_NAME}*.tgz
+
     LOG "Compiling TypeScript..."
     tsc
-
-    LOG "Removing old packages..."
 
     LOG "Creating npm package..."
     npm pack
