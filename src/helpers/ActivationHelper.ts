@@ -149,8 +149,10 @@ export class ActivationHelper<SDK, PrepareResult> {
 
     /**
      * Return SDK instance. If there's no sdkFactory function set, then throws an error.
+     * @param prepareData Optional `ActivationHelperPrepareData` object.
      */
-    async getPowerAuthSdk(): Promise<SDK> {
+    async getPowerAuthSdk(prepareData: ActivationHelperPrepareData | undefined = undefined): Promise<SDK> {
+        this.prepareData = prepareData
         return await this.withSDK(a => a)
     }
 
