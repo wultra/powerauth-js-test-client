@@ -235,19 +235,19 @@ export class ActivationHelper<SDK, PrepareResult> {
      * @returns Promise with void.
      */
     async prepareActivation(prepareData: ActivationHelperPrepareData | undefined = undefined): Promise<PrepareResult> {
-        this.prepareResultData = await this.withActivation(activation => this.prepareActivationImpl(activation, prepareData))
-        return this.prepareResultData
+        return this.withActivation(activation => this.prepareActivationImpl(activation, prepareData))
     }
 
     /**
      * Prepare activation implementation.
      */
-    private prepareActivationImpl(activation: Activation, data: ActivationHelperPrepareData | undefined): Promise<PrepareResult> {
+    private async prepareActivationImpl(activation: Activation, data: ActivationHelperPrepareData | undefined): Promise<PrepareResult> {
         if (!this.prepareStep) {
             throw new Error('Missing prepare step in ActivationHelper')
         }
         this.prepareData = data
-        return this.prepareStep(this, activation, data)
+        this.prepareResultData = await this.prepareStep(this, activation, data)
+        return this.prepareResultData
     }
 
     /**

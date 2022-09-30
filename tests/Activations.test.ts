@@ -57,6 +57,7 @@ describe('Manage PowerAuth applications', () => {
         expect(status).toBe(ActivationStatus.CREATED)
         // 
         await activationHelper.prepareActivation()
+        expect(activationHelper.prepareActivationResult).toBeTruthy()
         status = await activationHelper.getActivationStatus()
         expect(status).toBe(ActivationStatus.PENDING_COMMIT)
 
@@ -68,6 +69,7 @@ describe('Manage PowerAuth applications', () => {
     test('Test automatic activation create ', async () => {
         const activation = await activationHelper.createActivation()
         expect(activationHelper.powerAuthSdk).toBeDefined()
+        expect(activationHelper.prepareActivationResult).toBeTruthy()
         let status = await activationHelper.getActivationStatus()
         expect(status).toBe(ActivationStatus.ACTIVE)
     })
