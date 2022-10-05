@@ -22,16 +22,23 @@ import {
     Activation,
     ActivationDetail,
     ActivationOtpValidation,
+    ActivationPrepareData,
+    ActivationPrepareResult,
     ActivationStatus,
     Application,
     ApplicationDetail,
     ApplicationVersion,
     Config,
     ObjectId,
+    OfflineSignatureData,
+    OnlineSignatureData,
     PowerAuthServerError,
     RecoveryConfig,
     ServerVersion,
-    SystemStatus } from "../../index";
+    SignatureVerifyResult,
+    SystemStatus, 
+    TokenDigest,
+    TokenDigestVerifyResult} from "../../index";
 import { 
     ApplicationCreate_Request,
     ApplicationCreate_Response,
@@ -64,7 +71,9 @@ import {
     GetRecoveryConfig_Response,
     UpdateRecoveryConfig_Request,
     UpdateRecoveryConfig_Response } from "./Recovery";
-import { ActivationPrepareData, ActivationPrepareResult } from "../../model/Activation";
+import { 
+    TokenRemove_Request,
+    TokenRemove_Response } from "./Token";
 
 /**
  * Create `ServerAPI` implementation that connects to servers from V1.0 up to V1.2.x.
@@ -284,5 +293,30 @@ class ClientImpl implements ServerAPI {
             mac: response.mac,
             activationStatus: response.activationStatus
         }
+    }
+
+    // Signatures
+
+    verifyOnlineSignature(signatureData: OnlineSignatureData): Promise<SignatureVerifyResult> {
+        return this.client.post<OnlineSignatureData, SignatureVerifyResult>(Endpoints.signatureOnlineVerify, signatureData)
+    }
+
+    verifyOfflineSignature(signatureData: OfflineSignatureData): Promise<SignatureVerifyResult> {
+        return this.client.post<OfflineSignatureData, SignatureVerifyResult>(Endpoints.signatureOnlineVerify, signatureData)
+    }
+
+    // Tokens
+
+    async removeToken(activationId: string, tokenId: string): Promise<boolean> {
+        const request = {
+            activationId: activationId,
+            tokenId: tokenId
+        }
+        const response = await this.client.post<TokenRemove_Request, TokenRemove_Response>(Endpoints.tokenRemove, request)
+        return response.removed
+    }
+
+    verifyTokenDigest(tokenDigest: TokenDigest): Promise<TokenDigestVerifyResult> {
+        return this.client.post<TokenDigest, TokenDigestVerifyResult>(Endpoints.tokenVerify, tokenDigest)
     }
 }

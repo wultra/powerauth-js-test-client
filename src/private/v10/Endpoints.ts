@@ -32,8 +32,14 @@ export class Endpoints {
     static readonly activationUnblock: Endpoint         = { path: '/v3/activation/unblock' }
     static readonly activationUpdateOtp: Endpoint       = { path: '/v3/activation/otp/update' }
     static readonly activationDetail: Endpoint          = { path: '/v3/activation/status' }
-    static readonly activationPrepare: Endpoint          = { path: '/v3/activation/prepare' }
+    static readonly activationPrepare: Endpoint         = { path: '/v3/activation/prepare' }
 
     static readonly recoveryConfigDetail: Endpoint      = { path: '/v3/recovery/config/detail' }
     static readonly recoveryConfigUpdate: Endpoint      = { path: '/v3/recovery/config/update' }
+
+    static readonly signatureOnlineVerify: Endpoint     = { path: '/v3/signature/verify' }
+    static readonly signtureOfflineVerify: Endpoint     = { path: '/v3/signature/offline/verify' }
+
+    static readonly tokenRemove: Endpoint               = { path: '/v3/token/remove' }
+    static readonly tokenVerify: Endpoint               = { path: '/v3/token/validate' }
 }

@@ -24,7 +24,9 @@ import {
     Config,
     DEFAULT_MAX_FAILED_ATTEMPTS,
     DEFAULT_USER_ID,
-    PowerAuthTestServer } from "../index";
+    PowerAuthTestServer, 
+    SignatureHelper,
+    TokenHelper} from "../index";
 
 /**
  * Interface that contains data for activation prepare. The content highly depends
@@ -355,4 +357,41 @@ export class ActivationHelper<SDK, PrepareResult> {
             // We don't care about errors in this function.
         }
     }
+
+    // Related helpers
+
+    private signatureHelperInstance: SignatureHelper | undefined
+    private tokenHelperInstance: TokenHelper | undefined
+
+    /**
+     * Contains instance of `SignatureHelper` or throws an error if called in wrong state.
+     */
+    get signatureHelper(): SignatureHelper {
+        if (this.signatureHelperInstance === undefined) {
+            this.signatureHelperInstance = new SignatureHelper(this.server, this.appSetup)
+        }
+        return this.signatureHelperInstance
+    }
+
+    /**
+     * Contains instance of `TokenHelper` or throws an error if called in wrong state.
+     */
+    get tokenHelper(): TokenHelper {
+        if (this.tokenHelperInstance === undefined) {
+            this.tokenHelperInstance = new TokenHelper(this.server, this.appSetup)
+        }
+        return this.tokenHelperInstance
+    }
+}
+
+/**
+ * Helper function translate Activation object or string with activation ID into activation id. 
+ * @param activation Activation object or string with activation id.
+ * @returns Activation id.
+ */
+ export function getActivationId(activation: Activation | string): string {
+    if (typeof activation === 'string') {
+        return activation
+    }
+    return activation.activationId
 }

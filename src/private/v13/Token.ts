@@ -14,27 +14,11 @@
 // limitations under the License.
 //
 
+export interface TokenRemove_Request {
+    tokenId: string
+    activationId: string
+}
 
-// Main objects
-
-export * from './PowerAuthTestServer';
-export * from './PowerAuthServerError';
-export * from './Logger';
-
-// Model objects
-
-export * from './model/Activation'
-export * from './model/Application';
-export * from './model/Version';
-export * from './model/Config';
-export * from './model/ObjectId';
-export * from './model/Recovery';
-export * from './model/Signature';
-export * from './model/SystemStatus';
-export * from './model/Token';
-
-// Helpers
-
-export * from './helpers/ActivationHelper';
-export * from './helpers/SignatureHelper';
-export * from './helpers/TokenHelper';
+export interface TokenRemove_Response {
+    removed: boolean
+}

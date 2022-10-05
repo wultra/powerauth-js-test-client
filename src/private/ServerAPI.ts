@@ -25,9 +25,14 @@ import {
     ApplicationDetail,
     ApplicationVersion,
     Config,
+    OfflineSignatureData,
+    OnlineSignatureData,
     RecoveryConfig,
     ServerVersion,
-    SystemStatus
+    SignatureVerifyResult,
+    SystemStatus,
+    TokenDigest,
+    TokenDigestVerifyResult
  } from "../index"
 
 export interface ServerAPI {
@@ -212,5 +217,38 @@ export interface ServerAPI {
      * @returns Promise with `ActivationPrepareResult` in result.
      */
     activationPrepare(data: ActivationPrepareData): Promise<ActivationPrepareResult>
+
+    // Signatures
+
+    /**
+     * Verify online signature.
+     * @param signatureData Data for online signature verification.
+     * @returns Promise with `SignatureVerifyResult` in result.
+     */
+    verifyOnlineSignature(signatureData: OnlineSignatureData): Promise<SignatureVerifyResult>
+
+    /**
+     * Verify offline signature.
+     * @param signatureData Data for offline signature verification.
+     * @returns Promise with `SignatureVerifyResult` in result.
+     */
+    verifyOfflineSignature(signatureData: OfflineSignatureData): Promise<SignatureVerifyResult>
+
+    // Tokens
+
+    /**
+     * Remove token.
+     * @param activationId Activation identifier.
+     * @param tokenId Token identifier.
+     * @returns Promise with boolean in result.
+     */
+    removeToken(activationId: string, tokenId: string): Promise<boolean>
+
+    /**
+     * Verify token digest.
+     * @param tokenDigest Token digest data.
+     * @returns Promise with `TokenDigestVerifyResult` in result.
+     */
+    verifyTokenDigest(tokenDigest: TokenDigest): Promise<TokenDigestVerifyResult>
 }
 

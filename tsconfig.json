@@ -4,7 +4,7 @@
     "noImplicitAny": false,
     "removeComments": false,
     "declaration": true,
-    "target": "ES5",
+    "target": "ES6",
     "skipLibCheck": true,
     "lib": ["ES2016"],
     "strict": true,

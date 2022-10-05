@@ -21,6 +21,7 @@ import { ServerVersion } from "./model/Version"
 import { ServerAPI } from "./private/ServerAPI"
 import { ClientFactory } from "./private/ClientFactory"
 import { RecoveryConfig } from "./model/Recovery"
+import { getActivationId } from "./helpers/ActivationHelper"
 import {
     Activation,
     ActivationDetail,
@@ -39,6 +40,13 @@ import {
     DEFAULT_APPLICATION_NAME,
     DEFAULT_APPLICATION_VERSION_NAME,
     DEFAULT_MAX_FAILED_ATTEMPTS } from "./model/Config"
+import {
+    OfflineSignatureData,
+    OnlineSignatureData,
+    SignatureVerifyResult } from "./model/Signature"
+import {
+    TokenDigest,
+    TokenDigestVerifyResult } from "./model/Token"
 
 /**
  * Class that implements connection to PowerAuth Server RESTful API.
@@ -275,7 +283,7 @@ export class PowerAuthTestServer {
         otp: string,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return this.api.activationUpdateOtp(activationId(activation), otp, externalUserId)
+        return this.api.activationUpdateOtp(getActivationId(activation), otp, externalUserId)
     }
 
     /**
@@ -290,7 +298,7 @@ export class PowerAuthTestServer {
         otp: string | undefined = undefined,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return this.api.activationCommit(activationId(activation), otp, externalUserId)
+        return this.api.activationCommit(getActivationId(activation), otp, externalUserId)
     }
 
     /**
@@ -305,7 +313,7 @@ export class PowerAuthTestServer {
         reason: string | undefined = undefined,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return await this.api.activationBlock(activationId(activation), reason, externalUserId) == ActivationStatus.BLOCKED
+        return await this.api.activationBlock(getActivationId(activation), reason, externalUserId) == ActivationStatus.BLOCKED
     }
 
     /**
@@ -318,7 +326,7 @@ export class PowerAuthTestServer {
         activation: Activation | string,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return await this.api.activationUnblock(activationId(activation), externalUserId) == ActivationStatus.ACTIVE
+        return await this.api.activationUnblock(getActivationId(activation), externalUserId) == ActivationStatus.ACTIVE
     }
 
     /**
@@ -333,7 +341,7 @@ export class PowerAuthTestServer {
         revokeRecoveryCodes: boolean = true,
         externalUserId: string | undefined = undefined
     ): Promise<boolean> {
-        return this.api.activationRemove(activationId(activation), revokeRecoveryCodes, externalUserId)
+        return this.api.activationRemove(getActivationId(activation), revokeRecoveryCodes, externalUserId)
     }
 
     /**
@@ -343,7 +351,7 @@ export class PowerAuthTestServer {
      * @returns Promise with `ActivationDetail` in result.
      */
     getActivationDetil(activation: Activation | string, challenge: string | undefined = undefined): Promise<ActivationDetail> {
-        return this.api.getActivationDetail(activationId(activation), challenge)
+        return this.api.getActivationDetail(getActivationId(activation), challenge)
     }
 
     /**
@@ -355,16 +363,48 @@ export class PowerAuthTestServer {
     activationPrepare(data: ActivationPrepareData): Promise<ActivationPrepareResult> {
         return this.api.activationPrepare(data)
     }
-}
 
-/**
- * Helper function translate Activation object or string with activation ID into activation id. 
- * @param activation Activation object or string with activation id.
- * @returns Activation id.
- */
-function activationId(activation: Activation | string): string {
-    if (typeof activation === 'string') {
-        return activation
+    // Signatures
+
+    /**
+     * Verify online signature.
+     * @param signatureData Data for online signature verification.
+     * @returns Promise with `SignatureVerifyResult` in result.
+     */
+    verifyOnlineSignature(signatureData: OnlineSignatureData): Promise<SignatureVerifyResult> {
+        return this.api.verifyOnlineSignature(signatureData)
     }
-    return activation.activationId
+
+    /**
+     * Verify offline signature.
+     * @param signatureData Data for offline signature verification.
+     * @returns Promise with `SignatureVerifyResult` in result.
+     */
+    verifyOfflineSignature(signatureData: OfflineSignatureData): Promise<SignatureVerifyResult> {
+        return this.api.verifyOfflineSignature(signatureData)
+    }
+
+    // Tokens
+
+    /**
+     * Remove token.
+     * @param activationId Activation identifier.
+     * @param tokenId Token identifier.
+     * @returns Promise with boolean in result.
+     */
+    removeToken(activationId: Activation | string, tokenId: string): Promise<boolean> {
+        return this.api.removeToken(getActivationId(activationId), tokenId)
+     }
+
+     /**
+      * Verify token digest.
+      * @param tokenId Token identifier.
+      * @param digest Digest value.
+      * @param nonce Nonce value.
+      * @param timestamp Timestamp.
+      * @returns Promise with `TokenVerifyResult` in result.
+      */
+    verifyTokenDigest(tokenDigest: TokenDigest): Promise<TokenDigestVerifyResult> {
+        return this.api.verifyTokenDigest(tokenDigest)
+    }
 }
