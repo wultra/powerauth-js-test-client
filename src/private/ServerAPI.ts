@@ -25,6 +25,7 @@ import {
     ApplicationDetail,
     ApplicationVersion,
     Config,
+    SignedOfflineDataPayload,
     OfflineSignatureData,
     OnlineSignatureData,
     RecoveryConfig,
@@ -233,6 +234,31 @@ export interface ServerAPI {
      * @returns Promise with `SignatureVerifyResult` in result.
      */
     verifyOfflineSignature(signatureData: OfflineSignatureData): Promise<SignatureVerifyResult>
+
+    /**
+     * Create a data payload used as a challenge for non-personalized off-line signatures.
+     * @param application Application object.
+     * @param data Data to sign.
+     * @returns Promise with `EcdsaSignedOfflineData` in result.
+     */
+    createNonPersonalizedOfflineSignature(application: Application, data: string): Promise<SignedOfflineDataPayload>
+
+    /**
+     * Create a data payload used as a challenge for non-personalized off-line signatures.
+     * @param activationId Activation identifier.
+     * @param data Data to sign.
+     * @returns Promise with `EcdsaSignedOfflineData` in result.
+     */
+    createPersonalizedOfflineSignature(activationId: string, data: string): Promise<SignedOfflineDataPayload>
+
+     /**
+      * Verify ECDSA signature on device signed data.
+      * @param activationId Activation identifier.
+      * @param data Signed data.
+      * @param signature Signature calculated from data.
+      * @returns Promise with boolean result.
+      */
+    verifyDeviceSignedData(activationId: string, data: string, signature: string): Promise<boolean>
 
     // Tokens
 

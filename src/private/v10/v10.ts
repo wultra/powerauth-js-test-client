@@ -29,6 +29,7 @@ import {
     ApplicationDetail,
     ApplicationVersion,
     Config,
+    SignedOfflineDataPayload,
     ObjectId,
     OfflineSignatureData,
     OnlineSignatureData,
@@ -74,6 +75,11 @@ import {
 import { 
     TokenRemove_Request,
     TokenRemove_Response } from "./Token";
+import {
+    CreateNonPersonalizedOfflineSignature_Request,
+    CreatePersonalizedOfflineSignature_Request,
+    VerifyDeviceSignedData_Request,
+    VerifyDeviceSignedData_Response } from "./Siganture";
 
 /**
  * Create `ServerAPI` implementation that connects to servers from V1.0 up to V1.2.x.
@@ -303,6 +309,32 @@ class ClientImpl implements ServerAPI {
 
     verifyOfflineSignature(signatureData: OfflineSignatureData): Promise<SignatureVerifyResult> {
         return this.client.post<OfflineSignatureData, SignatureVerifyResult>(Endpoints.signatureOnlineVerify, signatureData)
+    }
+
+    createNonPersonalizedOfflineSignature(application: Application, data: string): Promise<SignedOfflineDataPayload> {
+        const request = {
+            applicationId: application.applicationId.legacyIdentifier,
+            data: data
+        }
+        return this.client.post<CreateNonPersonalizedOfflineSignature_Request, SignedOfflineDataPayload>(Endpoints.createNonPersonalizedOfflineSignature, request)
+    }
+
+    createPersonalizedOfflineSignature(activationId: string, data: string): Promise<SignedOfflineDataPayload> {
+        const request = {
+            activationId: activationId,
+            data: data
+        }
+        return this.client.post<CreatePersonalizedOfflineSignature_Request, SignedOfflineDataPayload>(Endpoints.createPersonalizedOfflineSignature, request)
+    }
+
+    async verifyDeviceSignedData(activationId: string, data: string, signature: string): Promise<boolean> {
+        const request = {
+            activationId: activationId,
+            data: data,
+            signature: signature
+        }
+        const result = await this.client.post<VerifyDeviceSignedData_Request, VerifyDeviceSignedData_Response>(Endpoints.ecdsaVerifyDeviceSignedData, request)
+        return result.signatureValid
     }
 
     // Tokens

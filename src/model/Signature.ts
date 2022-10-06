@@ -64,3 +64,26 @@ export interface SignatureVerifyResult {
     signatureType?: SignatureType
     remainingAttempts?: number
 }
+
+/**
+ * Defines key types in SignedOfflineDataPayload.
+ */
+export enum SigningKey {
+    KEY_SERVER_MASTER_PRIVATE = "0",
+    KEY_SERVER_PRIVATE = "1"
+}
+
+/**
+ * Object representing an offline data signed with ECDSA signature.
+ */
+export interface SignedOfflineDataPayload {
+    offlineData: string
+    nonce: string
+
+    // Attributes parsed from offline data property
+    parsedData?: string
+    parsedNonce?: string
+    parsedSigningKey?: SigningKey
+    parsedSignature?: string
+    parsedSignedData?: string
+}

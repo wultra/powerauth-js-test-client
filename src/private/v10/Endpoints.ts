@@ -42,4 +42,8 @@ export class Endpoints {
 
     static readonly tokenRemove: Endpoint               = { path: '/v3/token/remove' }
     static readonly tokenVerify: Endpoint               = { path: '/v3/token/validate' }
+
+    static readonly createNonPersonalizedOfflineSignature: Endpoint = { path: '/v3/signature/offline/non-personalized/create' }
+    static readonly createPersonalizedOfflineSignature: Endpoint    = { path: '/v3/signature/offline/personalized/create' }
+    static readonly ecdsaVerifyDeviceSignedData: Endpoint           = { path: '/v3/signature/ecdsa/verify' }
 }

@@ -41,12 +41,15 @@ import {
     DEFAULT_APPLICATION_VERSION_NAME,
     DEFAULT_MAX_FAILED_ATTEMPTS } from "./model/Config"
 import {
+    SignedOfflineDataPayload,
     OfflineSignatureData,
     OnlineSignatureData,
     SignatureVerifyResult } from "./model/Signature"
 import {
     TokenDigest,
     TokenDigestVerifyResult } from "./model/Token"
+import { Base64 } from "js-base64"
+import { parseOfflinePayloadData } from "./private/OfflineDataParser"
 
 /**
  * Class that implements connection to PowerAuth Server RESTful API.
@@ -382,6 +385,37 @@ export class PowerAuthTestServer {
      */
     verifyOfflineSignature(signatureData: OfflineSignatureData): Promise<SignatureVerifyResult> {
         return this.api.verifyOfflineSignature(signatureData)
+    }
+
+    /**
+     * Create a data payload used as a challenge for non-personalized off-line signatures.
+     * @param application Application object.
+     * @param data Data to sign.
+     * @returns Promise with `EcdsaSignedOfflineData` in result.
+     */
+    async createNonPersonalizedOfflineSignature(application: Application, data: string): Promise<SignedOfflineDataPayload> {
+        return parseOfflinePayloadData(await this.api.createNonPersonalizedOfflineSignature(application, data))
+    }
+
+    /**
+     * Create a data payload used as a challenge for non-personalized off-line signatures.
+     * @param activationId Activation identifier.
+     * @param data Data to sign.
+     * @returns Promise with `EcdsaSignedOfflineData` in result.
+     */
+    async createPersonalizedOfflineSignature(activation: Activation | string, data: string): Promise<SignedOfflineDataPayload> {
+        return parseOfflinePayloadData(await this.api.createPersonalizedOfflineSignature(getActivationId(activation), data))
+    }
+
+    /**
+     * Verify ECDSA signature on device signed data.
+     * @param activationId Activation identifier.
+     * @param data Signed data.
+     * @param signature Signature calculated from data.
+     * @returns Promise with boolean result.
+     */
+    verifyDeviceSignedData(activation: Activation | string, data: string, signature: string): Promise<boolean> {
+        return this.api.verifyDeviceSignedData(getActivationId(activation), Base64.encode(data), signature)
     }
 
     // Tokens
