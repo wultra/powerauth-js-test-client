@@ -22,12 +22,22 @@ export class PowerAuthServerError extends Error {
      * Construct PowerAuthServerError
      * @param message Error message.
      * @param httpStatusCode Optional status code from HTTP response.
+     * @param serverErrorCode Optional error coode returned from the server
+     * @param serverErrorMessage Optional error message returned from the server
      */
-    constructor(message: string, httpStatusCode: number | undefined = undefined) {
+    constructor(
+        message: string, 
+        httpStatusCode: number | undefined = undefined, 
+        serverErrorCode: string | undefined = undefined,
+        serverErrorMessage: string | undefined = undefined) {
         super(message)
         this.name = "PowerAuthServerError"
         this.httpStatusCode = httpStatusCode
+        this.serverErrorCode = serverErrorCode
+        this.serverErrorMessage = serverErrorMessage
     }
 
-    httpStatusCode: number | undefined
+    readonly httpStatusCode: number | undefined
+    readonly serverErrorCode: string | undefined
+    readonly serverErrorMessage: string | undefined
 }

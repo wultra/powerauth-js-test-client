@@ -116,13 +116,18 @@ export class HttpClient {
         // Throw an error
         const errorResponse = plainResponseObject as ResponseObject<ErrorResponse>
         if (!errorResponse.responseObject) {
-            if (statusCode == 401)
-            throw new PowerAuthServerError(`No error response returned from the server. Status = ${statusCode}`, statusCode)
+            if (statusCode == 401) {
+                throw new PowerAuthServerError(`Authentication failed. Status = ${statusCode}`, statusCode)
+            } else {
+                throw new PowerAuthServerError(`No error response returned from the server. Status = ${statusCode}`, statusCode)
+            }
         }
         // Throw an error
-        const code = errorResponse.responseObject?.code ?? '<<null-code>>'
-        const message = errorResponse.responseObject?.message ?? '<<null-message>>'
-        throw new PowerAuthServerError(`Server returned error ${code}, message '${message}'. Status = ${statusCode}`, statusCode)
+        const errorCode = errorResponse.responseObject?.code
+        const errorMessage = errorResponse.responseObject?.message
+        const codeStr = errorCode ?? '<<null-code>>'
+        const messageStr = errorMessage ?? '<<null-message>>'
+        throw new PowerAuthServerError(`Server returned error ${codeStr}, message '${messageStr}'. Status = ${statusCode}`, statusCode, errorCode, errorMessage)
     }
 
     // Private methods
