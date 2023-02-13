@@ -91,7 +91,7 @@ export class ServerVersion {
     /**
      * Latest server version recognized by this library.
      */
-    static readonly LATEST = this.V1_4_0
+    static readonly LATEST = this.V1_5_0
     
     /**
      * Array with all defined versions.

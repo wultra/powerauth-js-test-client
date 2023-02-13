@@ -77,7 +77,7 @@ export class TokenHelper {
         if (!nonce)         throw Error('Missing nonce in token header')
         if (!timestamp)     throw Error('Missing timestamp in token header')
         const timestampVal = parseInt(timestamp)
-        if (timestampVal === NaN) throw Error('Invalid timestamp value in token header')
+        if (Number.isNaN(timestampVal)) throw Error('Invalid timestamp value in token header')
         return {
             tokenId: tokenId,
             tokenDigest: tokenDigest,

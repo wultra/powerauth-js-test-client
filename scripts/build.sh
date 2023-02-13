@@ -29,6 +29,8 @@ function USAGE
     echo "                      This is the default command if no"
     echo "                      command is specified."
     echo ""
+    echo "     prepare          Compile library for package preparation"
+    echo ""
     echo "     compile          Compile library and tests"
     echo ""
     echo "     test             Run jest tests"
@@ -56,6 +58,34 @@ function DIST_CLEANUP
 }
 
 # -----------------------------------------------------------------------------
+# Prepare files for package
+# -----------------------------------------------------------------------------
+function DO_PREPARE
+{
+    LOG_LINE
+    LOG "Building '$LIB_NAME'..."
+    LOG " - node version $NODE_VERSION"
+    LOG " - npm  version $NPM_VERSION"
+    LOG " - tsc  version $TSC_VERSION"
+    LOG_LINE
+
+    PUSH_DIR "$SRC_ROOT"
+    ###
+
+    DIST_CLEANUP
+
+    LOG "Removing old packages..."
+    local file=( ${LIB_NAME}*.tgz )
+    [[ -f "$file" ]] && $RM ${LIB_NAME}*.tgz
+
+    LOG "Compiling typescript..."
+    tsc
+
+    ###
+    POP_DIR  
+}
+
+# -----------------------------------------------------------------------------
 # Build and create package
 # -----------------------------------------------------------------------------
 function DO_BUILD
@@ -75,9 +105,6 @@ function DO_BUILD
     LOG "Removing old packages..."
     local file=( ${LIB_NAME}*.tgz )
     [[ -f "$file" ]] && $RM ${LIB_NAME}*.tgz
-
-    LOG "Compiling TypeScript..."
-    tsc
 
     LOG "Creating npm package..."
     npm pack
@@ -153,7 +180,7 @@ while [[ $# -gt 0 ]]
 do
     opt="$1"
     case "$opt" in
-        build | test | test-verbose | compile)
+        build | prepare | test | test-verbose | compile)
             DO_COMMAND=$opt
             ;;
         -h | --help | help)
@@ -181,6 +208,7 @@ NPM_VERSION=$(npm -v)
 
 case "$DO_COMMAND" in
     build) DO_BUILD ;;
+    prepare) DO_PREPARE ;;
     compile) DO_COMPILE ;;
     test) DO_TEST --silent ;;
     test-verbose) DO_TEST ;;
