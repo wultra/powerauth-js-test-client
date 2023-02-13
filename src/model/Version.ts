@@ -85,6 +85,9 @@ export class ServerVersion {
     static readonly V1_3_0 = new ServerVersion("1.3",   1003000, ProtocolVersion.V3_1)
     static readonly V1_4_0 = new ServerVersion("1.4",   1004000, ProtocolVersion.V3_1)
     
+    // SNAPSHOT versions (e.g. not released yet)
+    static readonly V1_5_0 = new ServerVersion("1.5",   1005000, ProtocolVersion.V3_1)
+    
     /**
      * Latest server version recognized by this library.
      */
@@ -100,6 +103,7 @@ export class ServerVersion {
         this.V1_2_5,
         this.V1_3_0,
         this.V1_4_0,
+        this.V1_5_0,
     ]
 
     /**

@@ -155,7 +155,7 @@ export class ActivationHelper<SDK, PrepareResult> {
      */
     async getPowerAuthSdk(prepareData: ActivationHelperPrepareData | undefined = undefined): Promise<SDK> {
         this.prepareData = prepareData
-        return await this.withSDK(a => a)
+        return this.withSDK(a => a)
     }
 
     /**
