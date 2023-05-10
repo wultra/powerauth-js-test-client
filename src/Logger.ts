@@ -140,15 +140,15 @@ export class Logger {
         }
     }
 
-    static request(url: URL, method: string, body: any, headers: HeadersInit) {
+    static request(url: string, method: string, body: any, headers: HeadersInit) {
         if (this.debugRequestResponse) {
-            this.logImpl.request(url.toString(), method, body, headers)
+            this.logImpl.request(url, method, body, headers)
         }
     }
 
-    static response(url: URL, data: any, headers: HeadersInit, status: number) {
+    static response(url: string, data: any, headers: HeadersInit, status: number) {
         if (this.debugRequestResponse) {
-            this.logImpl.response(url.toString(), data, headers, status)
+            this.logImpl.response(url, data, headers, status)
         }
     }
 }

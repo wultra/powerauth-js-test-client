@@ -67,7 +67,7 @@ export class HttpClient {
      */
     async post<TRequest, TResponse>(endpoint: Endpoint, request: TRequest): Promise<TResponse> {
         // Prepare full URL and request data
-        const url = new URL(this.baseUrl + endpoint.path)
+        const url = this.baseUrl + endpoint.path
         const requestObject: RequestObject<TRequest> = { requestObject: request }
         const headers = this.defaultHeaders
         
