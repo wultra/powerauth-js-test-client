@@ -1,6 +1,6 @@
 {
   "name": "powerauth-js-test-client",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Client library for PowerAuth Server RESTful API to support JavaScript integration tests with PowerAuth Server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
