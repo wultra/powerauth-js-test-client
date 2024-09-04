@@ -79,6 +79,7 @@ export class TokenHelper {
         const timestampVal = parseInt(timestamp)
         if (Number.isNaN(timestampVal)) throw Error('Invalid timestamp value in token header')
         return {
+            protocolVersion: version,
             tokenId: tokenId,
             tokenDigest: tokenDigest,
             nonce: nonce,

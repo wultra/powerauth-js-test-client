@@ -110,6 +110,8 @@ export interface ActivationPrepareData {
     encryptedData: string
     mac: string
     nonce?: string
+    timestamp?: number
+    protocolVersion?: string
 }
 
 /**
@@ -122,4 +124,6 @@ export interface ActivationPrepareData {
     userId: string
     encryptedData: string
     mac: string
+    nonce?: string
+    timestamp?: number
 }

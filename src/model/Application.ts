@@ -93,6 +93,7 @@ export interface ApplicationVersion {
     applicationVersionId: ObjectId
     applicationKey: string
     applicationSecret: string
+    mobileSdkConfig?: string
     supported: boolean
 }
 

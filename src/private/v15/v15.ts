@@ -38,7 +38,7 @@ import {
     ServerVersion,
     SignatureVerifyResult,
     SystemStatus, 
-    TokenDigest,
+    TokenDigest, 
     TokenDigestVerifyResult} from "../../index";
 import { 
     ApplicationCreate_Request,
@@ -50,29 +50,29 @@ import {
     ApplicationVersionCreate_Response, 
     ApplicationVersionSupport_Request,
     ApplicationVersionSupport_Response } from "./Application";
-import { 
+import {
     ActivationBlock_Request,
     ActivationBlock_Response,
     ActivationCommit_Request,
     ActivationCommit_Response,
     ActivationInit_Request,
-    ActivationInit_Response, 
+    ActivationInit_Response,
     ActivationOtpUpdate_Request,
-    ActivationOtpUpdate_Response,
-    ActivationPrepare_Request,
-    ActivationPrepare_Response,
-    ActivationRemove_Request,
-    ActivationRemove_Response,
-    ActivationStatus_Request,
-    ActivationStatus_Response,
+    ActivationOtpUpdate_Response, 
+    ActivationPrepare_Request, 
+    ActivationPrepare_Response, 
+    ActivationRemove_Request, 
+    ActivationRemove_Response, 
+    ActivationStatus_Request, 
+    ActivationStatus_Response, 
     ActivationUnblock_Request,
-    ActivationUnblock_Response} from "./Activation";
+    ActivationUnblock_Response} from "./Activation"
 import {
     GetRecoveryConfig_Request,
     GetRecoveryConfig_Response,
     UpdateRecoveryConfig_Request,
     UpdateRecoveryConfig_Response } from "./Recovery";
-import { 
+import {
     TokenRemove_Request,
     TokenRemove_Response } from "./Token";
 import {
@@ -82,25 +82,25 @@ import {
     VerifyDeviceSignedData_Response } from "./Siganture";
 
 /**
- * Create `ServerAPI` implementation that connects to servers from V1.0 up to V1.2.x.
+ * Create `ServerAPI` implementation that connects to servers V1.5 and newer.
  * @param config Configuration.
  * @param client HttpClient.
  * @returns Instance of ServerAPI.
  */
- export function createV10Client(config: Config, client: HttpClient): ServerAPI {
+export function createV15Client(config: Config, client: HttpClient): ServerAPI {
     return new ClientImpl(config, client)
 }
 
 /**
- * ServerAPI implementation that connects to servers from V1.0 up to V1.2.x.
+ * ServerAPI implementation that connects to servers V1.3 and newer.
  */
 class ClientImpl implements ServerAPI {
     
     readonly config: Config;
     readonly client: HttpClient
 
-    readonly minSupportedVersion = ServerVersion.V1_0_0
-    readonly maxSupportedVersion = ServerVersion.V1_2_5
+    readonly minSupportedVersion = ServerVersion.V1_5_0
+    readonly maxSupportedVersion = ServerVersion.V1_8_0
 
     private currentServerVersion: ServerVersion | undefined
 
@@ -118,7 +118,7 @@ class ClientImpl implements ServerAPI {
     validateServerVersion(serverVersion: string): ServerVersion {
         const version = ServerVersion.fromString(serverVersion)
         if (version.numericVersion < this.minSupportedVersion.numericVersion || version.numericVersion > this.maxSupportedVersion.numericVersion) {
-            throw new PowerAuthServerError(`Unsupported server version in V1_0 client. Version = ${serverVersion}`)
+            throw new PowerAuthServerError(`Unsupported server version in V1_5 client. Version = ${serverVersion}`)
         }
         return version
     }
@@ -135,65 +135,67 @@ class ClientImpl implements ServerAPI {
     
     async getApplicationList(): Promise<Application[]> {
         const list = (await this.client.postEmpty<ApplicationList_Response>(Endpoints.applicationList)).applications ?? []
-        return list.map(app => Application.fromV10Data(app.id, app.applicationName, app.applicationRoles))
+        return list.map(app => Application.fromV13Data(app.applicationId, app.applicationRoles))
     }
 
     async createApplication(applicationName: string): Promise<Application> {
-        const request = { applicationName: applicationName }
+        const request = { applicationId: applicationName }
         const app = await this.client.post<ApplicationCreate_Request, ApplicationCreate_Response>(Endpoints.applicationCreate, request)
-        return Application.fromV10Data(app.applicationId, app.applicationName, app.applicationRoles)
+        return Application.fromV13Data(app.applicationId, app.applicationRoles)
     }
 
     async getApplicationDetail(application: Application): Promise<ApplicationDetail> {
-        const request = { applicationId: application.applicationId.legacyIdentifier }
+        const request = { applicationId: application.applicationId.identifier }
         const detail = await this.client.post<ApplicationDetail_Request, ApplicationDetail_Response>(Endpoints.applicationDetail, request)
         return {
-            applicationId: ObjectId.fromV10Data(detail.applicationId, detail.applicationName),
+            applicationId: ObjectId.fromV13Data(detail.applicationId),
             masterPublicKey: detail.masterPublicKey,
             applicationRoles: detail.applicationRoles ?? [],
-            versions: detail.versions?.map(version => {
+            versions: (detail.versions ?? []).map(version => {
                 return {
                     applicationId: application.applicationId,
-                    applicationVersionId: ObjectId.fromV10Data(version.applicationVersionId, version.applicationVersionName),
+                    applicationVersionId: ObjectId.fromV13Data(version.applicationVersionId),
                     applicationKey: version.applicationKey,
                     applicationSecret: version.applicationSecret,
-                    mobileSdkConfig: undefined,
+                    mobileSdkConfig: version.mobileSdkConfig,
                     supported: version.supported
                 }
-            }) ?? []
+            })
         }
     }
 
     async createApplicationVersion(application: Application, versionName: string): Promise<ApplicationVersion> {
         const request = { 
-            applicationId: application.applicationId.legacyIdentifier,
-            applicationVersionName: versionName
+            applicationId: application.applicationId.identifier,
+            applicationVersionId: versionName
         }
         const response = await this.client.post<ApplicationVersionCreate_Request, ApplicationVersionCreate_Response>(Endpoints.applicationVersionCreate, request)
         return {
             applicationId: application.applicationId,
-            applicationVersionId: ObjectId.fromV10Data(response.applicationVersionId, response.applicationVersionName),
+            applicationVersionId: ObjectId.fromV13Data(response.applicationVersionId),
             applicationKey: response.applicationKey,
             applicationSecret: response.applicationSecret,
-            mobileSdkConfig: undefined,
+            mobileSdkConfig: response.mobileSdkConfig,
             supported: response.supported
         }
     }
 
     async setAppplicationVersionSupported(applicationVersion: ApplicationVersion, supported: boolean): Promise<boolean> {
-        const request = { applicationVersionId: applicationVersion.applicationVersionId.legacyIdentifier }
+        const request = {
+             applicationId: applicationVersion.applicationId.identifier,
+             applicationVersionId: applicationVersion.applicationVersionId.identifier 
+        }
         const response = await this.client.post<ApplicationVersionSupport_Request, ApplicationVersionSupport_Response>(Endpoints.applicationVersionSupport(supported), request)
         return response.supported
     }
 
-
     // Recovery
 
     async getRecoveryConfig(application: Application): Promise<RecoveryConfig> {
-        const request = { applicationId: application.applicationId.legacyIdentifier }
+        const request = { applicationId: application.applicationId.identifier }
         const response = await this.client.post<GetRecoveryConfig_Request, GetRecoveryConfig_Response>(Endpoints.recoveryConfigDetail, request)
         return {
-            applicationId: ObjectId.fromV10Data(response.applicationId, application.applicationName),
+            applicationId: ObjectId.fromV13Data(response.applicationId),
             activationRecoveryEnabled: response.activationRecoveryEnabled,
             recoveryPostcardEnabled: response.recoveryPostcardEnabled,
             allowMultipleRecoveryCodes: response.allowMultipleRecoveryCodes,
@@ -204,7 +206,7 @@ class ClientImpl implements ServerAPI {
 
     async updateRecoveryConfig(recoveryConfig: RecoveryConfig): Promise<boolean> {
         const request = {
-            applicationId: recoveryConfig.applicationId.legacyIdentifier,
+            applicationId: recoveryConfig.applicationId.identifier,
             activationRecoveryEnabled: recoveryConfig.activationRecoveryEnabled,
             recoveryPostcardEnabled: recoveryConfig.recoveryPostcardEnabled,
             allowMultipleRecoveryCodes: recoveryConfig.allowMultipleRecoveryCodes,
@@ -218,7 +220,7 @@ class ClientImpl implements ServerAPI {
 
     async activationInit(application: Application, userId: string, otp: string | undefined, otpValidation: ActivationOtpValidation | undefined, maxFailureCount: number | undefined): Promise<Activation> {
         const request = {
-            applicationId: application.applicationId.legacyIdentifier,
+            applicationId: application.applicationId.identifier,
             userId: userId,
             activationOtp: otp,
             activationOtpValidation: otpValidation,
@@ -296,7 +298,7 @@ class ClientImpl implements ServerAPI {
         return {
             activationId: response.activationId,
             userId: response.userId,
-            applicationId: ObjectId.fromV10Data(response.applicationId),
+            applicationId: ObjectId.fromV13Data(response.applicationId),
             encryptedData: response.encryptedData,
             mac: response.mac,
             activationStatus: response.activationStatus
@@ -315,7 +317,7 @@ class ClientImpl implements ServerAPI {
 
     createNonPersonalizedOfflineSignature(application: Application, data: string): Promise<SignedOfflineDataPayload> {
         const request = {
-            applicationId: application.applicationId.legacyIdentifier,
+            applicationId: application.applicationId.identifier,
             data: data
         }
         return this.client.post<CreateNonPersonalizedOfflineSignature_Request, SignedOfflineDataPayload>(Endpoints.createNonPersonalizedOfflineSignature, request)

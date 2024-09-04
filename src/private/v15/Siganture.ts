@@ -11,27 +11,25 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
+// limitations under the License.
 //
 
-import { SignatureType } from "./Signature"
-
-/**
- * Object representing token digest calculated on mobile device.
- */
-export interface TokenDigest {
-    protocolVersion: string
-    tokenId: string
-    tokenDigest: string
-    nonce: string
-    timestamp: number
+export interface CreateNonPersonalizedOfflineSignature_Request {
+    applicationId: string
+    data: string
 }
 
-/**
- * Object representing result from token digest validation on the server.
- */
-export interface TokenDigestVerifyResult {
-    tokenValid: boolean
+export interface CreatePersonalizedOfflineSignature_Request {
     activationId: string
-    userId: string
-    signatureType: SignatureType
+    data: string
+}
+
+export interface VerifyDeviceSignedData_Request {
+    activationId: string
+    data: string
+    signature: string
+}
+
+export interface VerifyDeviceSignedData_Response {
+    signatureValid: boolean
 }

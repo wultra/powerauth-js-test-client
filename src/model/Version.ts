@@ -29,6 +29,8 @@ export class ProtocolVersion {
     static readonly V2_1 = new ProtocolVersion(21, "2.1")
     static readonly V3_0 = new ProtocolVersion(30, "3.0")
     static readonly V3_1 = new ProtocolVersion(31, "3.1")
+    static readonly V3_2 = new ProtocolVersion(32, "3.2")
+    static readonly V3_3 = new ProtocolVersion(33, "3.3")
 
     private constructor(version: number, versionForHeader: string) {
         this.version = version
@@ -84,14 +86,20 @@ export class ServerVersion {
     static readonly V1_2_5 = new ServerVersion("1.2.5", 1002005, ProtocolVersion.V3_1)
     static readonly V1_3_0 = new ServerVersion("1.3",   1003000, ProtocolVersion.V3_1)
     static readonly V1_4_0 = new ServerVersion("1.4",   1004000, ProtocolVersion.V3_1)
-    
-    // SNAPSHOT versions (e.g. not released yet)
+
+    // Versions with protocol V3_2, but we use V3_1 as a temporary workaround, because MiniEcies doesn't support protocol V3.2
     static readonly V1_5_0 = new ServerVersion("1.5",   1005000, ProtocolVersion.V3_1)
+    static readonly V1_6_0 = new ServerVersion("1.6",   1005000, ProtocolVersion.V3_1)
+    static readonly V1_7_0 = new ServerVersion("1.7",   1005000, ProtocolVersion.V3_1)
+    static readonly V1_8_0 = new ServerVersion("1.8",   1005000, ProtocolVersion.V3_1)
+
+    // Versions with protocol V3_3, but we use V3_1 as a temporary workaround, because MiniEcies doesn't support protocol V3.3
+    static readonly V1_9_0 = new ServerVersion("1.9",   1005000, ProtocolVersion.V3_1)  // V3_3
     
     /**
      * Latest server version recognized by this library.
      */
-    static readonly LATEST = this.V1_5_0
+    static readonly LATEST = this.V1_9_0
     
     /**
      * Array with all defined versions.
@@ -104,6 +112,10 @@ export class ServerVersion {
         this.V1_3_0,
         this.V1_4_0,
         this.V1_5_0,
+        this.V1_6_0,
+        this.V1_7_0,
+        this.V1_8_0,
+        this.V1_9_0,
     ]
 
     /**
