@@ -20,6 +20,7 @@ import { HttpClient } from "./HttpClient";
 import { getSystemStatus } from "./StatusFetch";
 import { createV10Client } from "./v10/v10";
 import { createV13Client } from "./v13/v13";
+import { createV15Client } from "./v15/v15";
 
 export class ClientFactory {
     /**
@@ -57,12 +58,15 @@ export class ClientFactory {
     private static createServerForKnownVersion(client: HttpClient, config: Config, versionString: string): ServerAPI {
         const version = ServerVersion.fromString(versionString)
         let api: ServerAPI
-        if (version.numericVersion <= ServerVersion.V1_2_5.numericVersion) {
+        if (version.numericVersion < ServerVersion.V1_3_0.numericVersion) {
             Logger.info(`Creating interface for servers 1.0.x up to 1.2.x`)
             api = createV10Client(config, client)
-        } else {
-            Logger.info(`Creating interface for servers 1.3 and newer`)
+        } else if (version.numericVersion >= ServerVersion.V1_3_0.numericVersion && version.numericVersion < ServerVersion.V1_5_0.numericVersion) {
+            Logger.info(`Creating interface for servers 1.3 up to 1.4`)
             api = createV13Client(config, client)
+        } else {
+            Logger.info(`Creating interface for servers 1.5 and newer`)
+            api = createV15Client(config, client)
         }
         api.validateServerVersion(versionString)
         return api

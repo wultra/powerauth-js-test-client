@@ -47,14 +47,17 @@ export async function createActivationHelper(config: Config | undefined = undefi
         // Encrypt inner activation data with fake mobile client
         const otp = prepareData?.otpValidation == ActivationOtpValidation.ON_KEY_EXCHANGE ? prepareData.otp : undefined
         const encryptedPayload = sdk.createActivation({...activationPayload, activationOtp: otp})
+        const serverVersion = await helper.server.getServerVersion()
         // Prepare activation on the server
+        // TODO: handle different activation prepare calls for a different protocol versions
         const response = await helper.server.activationPrepare({
             activationCode: activation.activationCode!,
             applicationKey: helper.appSetup.appKey,
             ephemeralPublicKey: encryptedPayload.key!,
             encryptedData: encryptedPayload.body!,
             mac: encryptedPayload.mac!,
-            nonce: encryptedPayload.nonce!
+            nonce: encryptedPayload.nonce!,
+            protocolVersion: serverVersion.protocolVersion.versionForHeader
         })
         // Commit activation on the mini client
         sdk.commitActivation(response)

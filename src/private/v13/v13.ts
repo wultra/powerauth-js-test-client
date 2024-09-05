@@ -100,7 +100,7 @@ class ClientImpl implements ServerAPI {
     readonly client: HttpClient
 
     readonly minSupportedVersion = ServerVersion.V1_3_0
-    readonly maxSupportedVersion = ServerVersion.LATEST
+    readonly maxSupportedVersion = ServerVersion.V1_4_0
 
     private currentServerVersion: ServerVersion | undefined
 
@@ -157,6 +157,7 @@ class ClientImpl implements ServerAPI {
                     applicationVersionId: ObjectId.fromV13Data(version.applicationVersionId),
                     applicationKey: version.applicationKey,
                     applicationSecret: version.applicationSecret,
+                    mobileSdkConfig: undefined,
                     supported: version.supported
                 }
             })
@@ -174,6 +175,7 @@ class ClientImpl implements ServerAPI {
             applicationVersionId: ObjectId.fromV13Data(response.applicationVersionId),
             applicationKey: response.applicationKey,
             applicationSecret: response.applicationSecret,
+            mobileSdkConfig: undefined,
             supported: response.supported
         }
     }
