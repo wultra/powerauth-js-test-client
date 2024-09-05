@@ -100,7 +100,7 @@ class ClientImpl implements ServerAPI {
     readonly client: HttpClient
 
     readonly minSupportedVersion = ServerVersion.V1_5_0
-    readonly maxSupportedVersion = ServerVersion.V1_8_0
+    readonly maxSupportedVersion = ServerVersion.LATEST
 
     private currentServerVersion: ServerVersion | undefined
 
