@@ -89,12 +89,12 @@ export class ServerVersion {
 
     // Versions with protocol V3_2, but we use V3_1 as a temporary workaround, because MiniEcies doesn't support protocol V3.2
     static readonly V1_5_0 = new ServerVersion("1.5",   1005000, ProtocolVersion.V3_1)
-    static readonly V1_6_0 = new ServerVersion("1.6",   1005000, ProtocolVersion.V3_1)
-    static readonly V1_7_0 = new ServerVersion("1.7",   1005000, ProtocolVersion.V3_1)
-    static readonly V1_8_0 = new ServerVersion("1.8",   1005000, ProtocolVersion.V3_1)
+    static readonly V1_6_0 = new ServerVersion("1.6",   1006000, ProtocolVersion.V3_1)
+    static readonly V1_7_0 = new ServerVersion("1.7",   1007000, ProtocolVersion.V3_1)
+    static readonly V1_8_0 = new ServerVersion("1.8",   1008000, ProtocolVersion.V3_1)
 
     // Versions with protocol V3_3, but we use V3_1 as a temporary workaround, because MiniEcies doesn't support protocol V3.3
-    static readonly V1_9_0 = new ServerVersion("1.9",   1005000, ProtocolVersion.V3_1)  // V3_3
+    static readonly V1_9_0 = new ServerVersion("1.9",   1009000, ProtocolVersion.V3_1)  // V3_3
     
     /**
      * Latest server version recognized by this library.
